@@ -17,7 +17,13 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
 
-      - name: Create Maven settings.xml with Anypoint credentials
+      - name: Install Maven 3.8.8
+        run: |
+          wget -q https://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
+          tar -xzf apache-maven-3.8.8-bin.tar.gz
+          echo "$PWD/apache-maven-3.8.8/bin" >> $GITHUB_PATH
+
+      - name: Create Maven settings.xml
         run: |
           mkdir -p ~/.m2
           cat > ~/.m2/settings.xml << 'EOF'
