@@ -1,32 +1,70 @@
-- name: Create Maven settings.xml
+name: MUnit Tests
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  munit:
+    runs-on: ubuntu-latest
+    env:
+      ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+      ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+
+      - name: Install Maven 3.8.8
+        run: |
+          wget -q https://archive.apache.org/dist/maven/maven-3/3.8.8/binaries/apache-maven-3.8.8-bin.tar.gz
+          tar -xzf apache-maven-3.8.8-bin.tar.gz
+          echo "$PWD/apache-maven-3.8.8/bin" >> $GITHUB_PATH
+
+      - name: Create Maven settings.xml
         run: |
           mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml << EOF
+          PASS="${ANYPOINT_CLIENT_ID}~?~${ANYPOINT_CLIENT_SECRET}"
+          cat > ~/.m2/settings.xml << SETTINGS
           <settings>
             <servers>
               <server>
                 <id>anypoint-exchange-v3-student-deployment</id>
                 <username>~~~Client~~~</username>
-                <password>${ANYPOINT_CLIENT_ID}~?~${ANYPOINT_CLIENT_SECRET}</password>
+                <password>${PASS}</password>
               </server>
               <server>
                 <id>anypoint-exchange-v3</id>
                 <username>~~~Client~~~</username>
-                <password>${ANYPOINT_CLIENT_ID}~?~${ANYPOINT_CLIENT_SECRET}</password>
+                <password>${PASS}</password>
               </server>
               <server>
                 <id>releases-ee</id>
                 <username>~~~Client~~~</username>
-                <password>${ANYPOINT_CLIENT_ID}~?~${ANYPOINT_CLIENT_SECRET}</password>
+                <password>${PASS}</password>
               </server>
               <server>
                 <id>mulesoft-releases</id>
                 <username>~~~Client~~~</username>
-                <password>${ANYPOINT_CLIENT_ID}~?~${ANYPOINT_CLIENT_SECRET}</password>
+                <password>${PASS}</password>
               </server>
             </servers>
           </settings>
-          EOF
-        env:
-          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
-          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+          SETTINGS
+
+      - name: Install BOM
+        run: mvn install -f bom/pom.xml -N
+
+      - name: Install parent POM
+        run: mvn install -f parent-pom/pom.xml -N
+
+      - name: Install apps-commons
+        run: mvn install -f apps-commons/pom.xml
+
+      - name: Run MUnit - customer-web-eapi
+        run: mvn test -f customer-web-eapi/pom.xml
