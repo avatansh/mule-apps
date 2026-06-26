@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
+		<artifactId>solutions-bom</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../bom/pom.xml</relativePath>
+	</parent>
+	
+	<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
+	<artifactId>solutions-parent-pom</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>solutions-parent-pom</name>
+
+	<properties>
+		<type>custom</type>
+		<!-- the layers of API-led connectivity, used for assigning layer in Visualizer: must be assigned to api.layer property -->
+		<api.layer.eapi>Experience</api.layer.eapi>
+		<api.layer.papi>Process</api.layer.papi>
+		<api.layer.sapi>System</api.layer.sapi>
+		<api.layer.backend>Backend</api.layer.backend>
+		<api.layer.none>None</api.layer.none>
+		<!-- for automated deployments -->
+		<deployment.env>set with -Ddeployment.env=...</deployment.env>
+		<deployment.suffix>-${deployment.env}</deployment.suffix>
+		<deployment.name>${project.name}${deployment.suffix}</deployment.name>
+		<!-- requires AP environments to have the same name as the env property value in Mule apps (which determines the property files to load) -->
+		<ap.environment>${deployment.env}</ap.environment>
+		<ap.client_id>set with -Dap.client_id=...</ap.client_id>
+		<ap.client_secret>set with -Dap.client_secret=...</ap.client_secret>
+		<ap.ca.client_id>set with -Dap.ca.client_id=...</ap.ca.client_id>
+		<ap.ca.client_secret>set with -Dap.ca.client_secret=...</ap.ca.client_secret>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<configuration>
+						<nonFilteredFileExtensions>
+							<nonFilteredFileExtension>p12</nonFilteredFileExtension>
+							<nonFilteredFileExtension>crt</nonFilteredFileExtension>
+							<nonFilteredFileExtension>pem</nonFilteredFileExtension>
+						</nonFilteredFileExtensions>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+				</plugin>
+				<plugin>
+					<groupId>org.mule.tools.maven</groupId>
+					<artifactId>mule-maven-plugin</artifactId>
+					<extensions>true</extensions>
+					<configuration>
+						<cloudhub2Deployment>
+						  <businessGroup/>
+						  <environment>${ap.environment}</environment>
+						  <muleVersion>${app.runtime.semver}</muleVersion>
+						  <target>Cloudhub-US-East-2</target>
+						  <provider>MC</provider>
+						  <replicas>1</replicas>
+						  <vCores>0.1</vCores>
+						  <applicationName>${deployment.name}</applicationName>
+						  <deploymentTimeout>600000</deploymentTimeout>
+						  <connectedAppClientId>${ap.ca.client_id}</connectedAppClientId>
+						  <connectedAppClientSecret>${ap.ca.client_secret}</connectedAppClientSecret>
+						  <connectedAppGrantType>client_credentials</connectedAppGrantType>
+						  <properties>
+							<anypoint.platform.config.analytics.agent.enabled>true</anypoint.platform.config.analytics.agent.enabled>
+							<anypoint.platform.visualizer.displayName>${project.name}</anypoint.platform.visualizer.displayName>
+							<anypoint.platform.visualizer.layer>${api.layer}</anypoint.platform.visualizer.layer>
+							<env>${deployment.env}</env>
+						  </properties>
+						  <secureProperties>
+							<encrypt.key>${encrypt.key}</encrypt.key>
+							<anypoint.platform.client_id>${ap.client_id}</anypoint.platform.client_id>
+							<anypoint.platform.client_secret>${ap.client_secret}</anypoint.platform.client_secret>
+						  </secureProperties>
+						  <deploymentSettings>
+							<http>
+							  <inbound>
+								<lastMileSecurity>true</lastMileSecurity>
+							  </inbound>
+							</http>
+						  </deploymentSettings>
+						  <integrations>
+							<services>
+							  <objectStoreV2>
+								<enabled>true</enabled>
+							  </objectStoreV2>
+							</services>
+						  </integrations>
+						</cloudhub2Deployment>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<http:listener-config name="apiHttpListenerConfig">
+        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS" readTimeout="${https.read.timeout}" connectionIdleTimeout="${https.idle.timeout}" tlsContext="apiTLSContext" />
+    </http:listener-config>
+    <apikit:config name="customer-accounts-papi-config" api="resource::2e14f8c6-4d60-481b-bfb6-798695efc8f4:customer-accounts-papi:1.0.2:raml:zip:customer-accounts-papi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />     
+	<configuration-properties doc:name="envConfigurationProperties" doc:id="3647a966-b00f-4878-921c-e3fe0ebf85ac" file="properties\config-${env}.yaml" />
+	<configuration-properties doc:name="configurationProperties" doc:id="ad2d2b46-449a-49b4-8e23-9960d3c1f834" file="properties\config.yaml" />
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="apiAutodiscovery" doc:id="e777e6b3-c274-4f5d-985c-b073405b18b8" flowRef="customer-accounts-papi-main" />
+	<http:request-config name="sfSapiHttpsRequestConfiguration" doc:name="HTTP Request configuration" doc:id="2a8f15a7-f8e0-4124-9c15-759820ad4a55" responseTimeout="${request.config.sapi.sf.response.timeout}">
+		<http:request-connection protocol="HTTPS" tlsContext="apiTLSContext" host="${request.config.sapi.sf.host}" port="${request.config.sapi.sf.port}" connectionIdleTimeout="${request.config.sapi.sf.idle.timeout}">
+			<reconnection >
+				<reconnect frequency="${request.config.sapi.sf.retry.frequency}" count="${request.config.sapi.sf.retry.attempts}"/>
+			</reconnection>
+		</http:request-connection>
+		<http:default-headers >
+			<http:default-header key="client_id" value='#[attributes.headers."client_id"]' />
+			<http:default-header key="client_secret" value='#[attributes.headers."client_secret"]' />
+			<http:default-header key="globalTranId" value="#[attributes.headers.globalTranId]" />
+			<http:default-header key="externalTranId" value="#[vars.externalTranId]" />
+		</http:default-headers>
+	</http:request-config>
+	<http:request-config name="twilioSapiHttpsRequestConfig" doc:name="HTTP Request configuration" doc:id="aab4f724-3a66-4893-8979-058e44effa6a" responseTimeout="${request.config.sapi.twilio.response.timeout}">
+		<http:request-connection protocol="HTTPS" tlsContext="apiTLSContext" host="${request.config.sapi.twilio.host}" port="${request.config.sapi.twilio.port}" connectionIdleTimeout="${request.config.sapi.twilio.idle.timeout}">
+			<reconnection >
+				<reconnect frequency="${request.config.sapi.twilio.retry.frequency}" count="${request.config.sapi.twilio.retry.attempts}"/>
+			</reconnection>
+		</http:request-connection>
+		<http:default-headers >
+			<http:default-header key="client_id" value="#[attributes.headers.&quot;client_id&quot; default p('secure::app.clientId')]" />
+			<http:default-header key="client_secret" value="#[attributes.headers.&quot;client_secret&quot; default p('secure::app.clientSecret')]" />
+			<http:default-header key="globalTranId" value="#[attributes.headers.globalTranId]" />
+			<http:default-header key="externalTranId" value="#[vars.externalTranId]" />
+		</http:default-headers>
+	</http:request-config>
+	<http:request-config name="gmailSapiHttpsRequestConfig" doc:name="HTTP Request configuration" doc:id="2cfc29c6-d15b-4984-a3d8-93b83265b05e" responseTimeout="${request.config.sapi.gmail.response.timeout}">
+		<http:request-connection protocol="HTTPS" tlsContext="apiTLSContext" host="${request.config.sapi.gmail.host}" port="${request.config.sapi.gmail.port}" connectionIdleTimeout="${request.config.sapi.gmail.idle.timeout}">
+			<reconnection >
+				<reconnect frequency="${request.config.sapi.gmail.retry.frequency}" count="${request.config.sapi.gmail.retry.attempts}"/>
+			</reconnection>
+		</http:request-connection>
+		<http:default-headers >
+			<http:default-header key="client_id" value="#[attributes.headers.&quot;client_id&quot; default p('secure::app.clientId')]" />
+			<http:default-header key="client_secret" value="#[attributes.headers.&quot;client_secret&quot; default p('secure::app.clientSecret')]" />
+			<http:default-header key="globalTranId" value="#[attributes.headers.globalTranId]" />
+			<http:default-header key="externalTranId" value="#[vars.externalTranId]" />
+		</http:default-headers>
+	</http:request-config>
+	<json-logger:config name="jsonLoggerConfig" doc:name="JSON Logger Config" doc:id="1376a54f-f746-4d67-bc0b-fd47e67972bf" environment="${env}" />
+</mule>

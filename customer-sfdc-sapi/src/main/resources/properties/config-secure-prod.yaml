@@ -1,0 +1,8 @@
+tls.keystore:
+  password: "![pycU1zqlxMlU0aqUX6wyQA==]"
+  keyPassword: "![pycU1zqlxMlU0aqUX6wyQA==]"
+  
+sfdc:
+  username: "![z5+O5+ZM9zszwmBvFX3EmM/oD6N2yEsK3frjJQvmbV0e0rZt9fxGNGVAFMkZu0oI]"
+  password: "![I67ySkrWkR4v3ni2mNGqZw==]"
+  token: "![HNUvcAiGuUqk+rDI35sZoodzh71n62vO3JIzi89ct1E=]"

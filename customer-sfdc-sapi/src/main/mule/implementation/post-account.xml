@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-post-account" doc:id="c0f691d5-7a66-474d-8a1a-8ac336b4e04c" >
+		<ee:transform doc:name="PV SET objectType and Map Request Payload" doc:id="d9cbd9d7-1887-44c5-9bec-51fbcd7b0e25" >
+			<ee:message >
+				<ee:set-payload resource="dwl/p-post-account-request.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="objectType" ><![CDATA[p('objectType.account')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-create-sfdc" doc:id="9c80f4c8-4009-4f39-b09a-d1934909e8ca" name="cf-create-sfdc" />
+	</sub-flow>
+</mule>

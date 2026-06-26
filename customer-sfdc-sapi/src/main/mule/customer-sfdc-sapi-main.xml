@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="customer-sfdc-sapi-main">
+        <http:listener config-ref="apiHttpListenerConfig" path="/api/${api.majorVersion}/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="e26a0c33-41b8-433a-8149-b10f9541691f" variableName="flowName" />
+        <flow-ref doc:name="csf-set-global-attributes" doc:id="72c65a5d-9757-4dfa-a2cc-8a08a237d886" name="csf-set-global-attributes" />
+        <flow-ref doc:name="csf-logger-request-received" doc:id="c36d5d65-50ae-4ce6-9326-bc1e14336d17" name="csf-logger-request-received" />
+        <apikit:router config-ref="customer-sfdc-sapi-config" />
+        <set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="9a9df266-b655-4612-9245-c0b7edf9be8d" variableName="flowName" />
+        <flow-ref doc:name="csf-logger-success-response-sent" doc:id="784f38cd-55f2-422f-8e7d-aba74098430b" name="csf-logger-success-response-sent" />
+        <error-handler ref="api-error-handler" />
+    </flow>
+    <flow name="get:\ping:customer-sfdc-sapi-config">
+        <flow-ref doc:name="sf-check-ping-status" doc:id="bd2e9a85-1ed7-4d7c-8218-dc93216d884f" name="sf-check-ping-status" />
+    </flow>
+    <flow name="get:\accounts:customer-sfdc-sapi-config">
+        <flow-ref doc:name="mf-impl-get-accounts" doc:id="7f00afd5-a060-481c-8a44-32673ef8b96f" name="mf-impl-get-accounts" />
+    </flow>
+    <flow name="post:\accounts:application\json:customer-sfdc-sapi-config">
+        <flow-ref doc:name="mf-impl-post-account" doc:id="1888d82f-604a-4aeb-ba6f-cbb96b8f18a0" name="mf-impl-post-account" />
+    </flow>
+    <flow name="patch:\accounts:application\json:customer-sfdc-sapi-config">
+        <flow-ref doc:name="mf-impl-patch-account" doc:id="47dd223d-5f37-4544-87fc-55f244874600" name="mf-impl-patch-account" />
+    </flow>
+</mule>

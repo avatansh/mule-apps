@@ -1,0 +1,55 @@
+api:
+  id: "18680332"
+
+tls.keystore:
+  type:        "pkcs12"
+  path:        "certs/customer-accounts-papi-dev.p12"
+  alias:       "server"
+
+mq:
+  reconnect:
+    frequency: "2000"
+    attempts: "1"
+
+subscriber:
+  ackTimeout: "60000"
+
+queue:
+  accounts: "accounts-q"
+  error:
+    transient: "transient-err-q"
+    persistent: "persistent-err-q"
+
+request:
+  config:
+    sapi:
+      sf:
+        host: "customer-sfdc-sapi-dev-vpsht8.5sc6y6-3.usa-e2.cloudhub.io"
+        port: ""
+        response:
+          timeout: "60000"
+        idle:
+          timeout: "50000"
+        retry:
+          frequency: "2000"
+          attempts: "2"
+      twilio:
+        host: "notify-twilio-sapi-dev-vpsht8.5sc6y6-4.usa-e2.cloudhub.io"
+        port: ""
+        response:
+          timeout: "60000"
+        idle:
+          timeout: "50000"
+        retry:
+          frequency: "2000"
+          attempts: "2"
+      gmail:
+        host: "notify-gmail-sapi-dev-vpsht8.5sc6y6-3.usa-e2.cloudhub.io"
+        port: ""
+        response:
+          timeout: "60000"
+        idle:
+          timeout: "50000"
+        retry:
+          frequency: "2000"
+          attempts: "2"

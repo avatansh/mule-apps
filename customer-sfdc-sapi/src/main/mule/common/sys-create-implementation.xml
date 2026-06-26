@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="cf-create-sfdc" doc:id="5e7f1c93-363a-44e8-866d-a554960b7e0c" >
+		<set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="33ff7bd4-495a-4918-845c-abdf6c3959e6" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-sent" doc:id="f4898e83-f9c5-4a61-b03f-f3161f5effb0" name="csf-logger-request-sent" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Before Invoking Process API" doc:id="8ae70169-1de5-4379-834a-7a02ddfd8bfb" message="#[payload]" />
+		<salesforce:create doc:name="Create Records" doc:id="f93e073f-529f-4f52-b861-36d7a474c129" config-ref="salesforceConfig" type="#[vars.objectType]"/>
+		<ee:transform doc:name="DW Convert to JSON" doc:id="433257f1-4bec-4447-9092-5a94fd8d043c" >
+			<ee:message >
+				<ee:set-payload resource="dwl/common/p-common-convert-to-json.dwl" />
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="DW Append TranID and Timestamp" doc:id="432f491f-5f32-420b-bcec-d1d9df8370ca" >
+			<ee:message >
+				<ee:set-payload resource="dwl/common/p-common-append.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="LOG DEBUG After Invoking Process API" doc:id="7930896d-ed6b-4f7f-b6c3-3a1ac6fc0cc6" message="#[payload]" />
+		<flow-ref doc:name="csf-logger-success-response-received" doc:id="488c202b-3ec4-45ff-9e95-9792edece3a5" name="csf-logger-success-response-received" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="270edda1-e56d-4072-ba98-86f89f4d0f37" >
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="5d510363-99c2-45a9-8e74-a93ff3831807" name="csf-logger-failure-response-received" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

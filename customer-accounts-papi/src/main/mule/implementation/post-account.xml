@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-post-account" doc:id="8d9e2dc8-89ef-43b1-9f03-1ec7dbbdc4c5" >
+		<ee:transform doc:name="PV SET path, method and Map Request Payload" doc:id="456f705d-8dae-474b-be10-61f720966ce4" >
+			<ee:message >
+				<ee:set-payload resource="dwl/p-post-account-request.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[p('sapi.accounts.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA[p('method.create')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-sf-system-api" doc:id="b14e916d-46ba-4212-bace-8fc181872fa1" name="cf-request-sf-sapi" />
+		<choice doc:name="Check if Status is Success" doc:id="228bb5aa-c138-4144-ad23-abffb11ffde7" >
+			<when expression="#[payload.items[0].successful]" >
+				<logger level="INFO" doc:name="LOG INFO Success from SFDC" doc:id="cc0bde67-8b79-4874-9a6d-1823bebf8186" message='#["Recieved Status as Successful from Salesforce"]' />
+			</when>
+			<otherwise >
+				<raise-error doc:name="Salesforce Error" doc:id="5dbf108e-b990-49d2-aad5-29975d5f00af" type="SALESFORCE:ERROR" description="#[payload.items[0].message]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

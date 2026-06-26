@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+	<error-handler name="api-error-handler" doc:id="a14ea059-bb49-495c-be2a-b44f117fe8b4" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1e07e96c-a9db-4bc2-9bd2-a4ea2427de83" type="APIKIT:BAD_REQUEST, HTTP:BAD_REQUEST" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="904550e5-5007-43ca-b79e-684c4c6ef81d" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="a8f9832e-7598-4f9a-8268-5f2b2ec51eba" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="dc19f6fd-3965-47c9-a480-0e4d1c0b3bd0" type="APIKIT:NOT_FOUND, HTTP:NOT_FOUND" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="2aae8a2a-b02b-4fd2-b364-74668867a670">
+				<ee:message>
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="c94f83b2-4d30-4119-b9ba-475157ebafeb" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="138e640a-1623-47aa-9ab1-bbf2467a8068" type="APIKIT:METHOD_NOT_ALLOWED, HTTP:METHOD_NOT_ALLOWED" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="d28368f7-cc6d-4dc1-a6d7-f876deca1fef" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[405]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="05535141-7b0b-40d7-a657-94fa1f17ac1f" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1b9a6df1-03fa-4de5-b9ba-6e1e72d9b641" type="APIKIT:NOT_ACCEPTABLE, HTTP:NOT_ACCEPTABLE" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="4916269d-ce95-41ec-9389-f994c28350a0" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[406]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="5e61c78f-8bb5-4b11-b7f2-1f37525911e7" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9264e902-1c2d-42a5-8589-534cb72d5f7a" type="APIKIT:UNSUPPORTED_MEDIA_TYPE, HTTP:UNSUPPORTED_MEDIA_TYPE" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="0cc0d94d-d35c-4baf-bae0-16daf7be130e" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[415]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="219266fa-0cf6-4eb3-b650-0f7ddd74248f" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b6d924f6-35b2-4c09-b615-ffeac38b9849" type="APIKIT:NOT_IMPLEMENTED" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="9488615c-c6a1-4168-b422-fb51d19029c7" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[501]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="2fe55328-9675-4f79-acff-3be6cd0917df" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bd42f7c1-af63-44bc-a287-d44bea7290de" type="HTTP:CLIENT_SECURITY" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="778a2540-96fc-4aaa-b3ba-f454a4c40945" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="7ba95f62-fd64-4f2d-bce1-20d6153b5409" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="55203746-f35f-4386-b89d-d023038b06b0" type="HTTP:CONNECTIVITY" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="ccb2fc2e-9e8e-48c0-be97-404455a657f3" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[502]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="b699fa35-9524-4ae0-9c77-661718938994" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="7783defe-2f70-465f-9020-e70051005db0" type="HTTP:FORBIDDEN" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="2415b21f-a05e-4d86-b19f-755a9d9d63e3" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[403]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="c2e2f93c-fe6c-4c67-85d7-ed966af3a22b" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="76a1b0db-8d1e-4eaf-b556-a7f2ecc1d890" type="HTTP:RETRY_EXHAUSTED" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="bec93ae4-dde6-41de-8fea-242733fb4161" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="695e6e6f-2a40-4f60-a548-bbdcccd57937" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a6fe1194-a256-4b26-ad66-9a97dfcf85ef" type="HTTP:SECURITY" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="af8e0a57-b247-45fb-b408-2dc7c68d0efc" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="fd2f33b6-c1e1-4fa4-9aaf-5ed57c9cf466" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="00a324f0-4014-47c7-b553-ca9e545984a1" type="HTTP:SERVICE_UNAVAILABLE" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="b4b9c623-b8e9-4e7a-b674-6039a56b4441" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[503]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="2aa931fd-35b5-42d7-84bc-a2da6674f4e1" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5a5ee38e-0b62-45da-afe0-c47b52c89cbb" type="HTTP:TIMEOUT" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="76574801-9a9b-4a8d-aa53-e2a90a87c86e" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[408]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="72e388cc-c492-4188-99c2-c87c4d30627c" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1e023933-377e-4f8c-99e2-3818c88cc789" type="HTTP:TOO_MANY_REQUESTS" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="5a838719-9319-42e0-bba1-48d4e6856e1d" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[429]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="8894041d-13b8-4cdf-aed7-b4cfe028c258" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="410310b4-185c-4914-8ada-c09ba8956cb0" type="HTTP:UNAUTHORIZED" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="33c479e5-c943-46e4-9219-e669552b37ee" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[401]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="052c647b-1730-45ab-9666-df4824848e36" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b279048a-0e7d-4d12-bc95-9b43de9f284e" type="HTTP:BAD_GATEWAY" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="88317945-0656-45d1-b88f-e1b3a45c9a62" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[502]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="f9236a15-26b1-4508-a799-25ba4fe42ec4" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="febeec24-0dd5-4034-9576-e00c8c384781" type="HTTP:GATEWAY_TIMEOUT" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="d2a833c3-3038-447a-a150-e2de0352db44" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[504]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="88f605f2-0d4b-47b4-8f46-ddba98906b46" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="56940676-c73f-4099-a331-48c082a43ea3" type="HTTP:BASIC_AUTHENTICATION" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="79ff13b2-f429-43e7-8b74-59bda07512ce" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[401]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="4190eab9-d0d6-44ab-873b-985c2616ae72" name="csf-logger-failure-response-sent" />
+		
+</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="30c2046f-a856-4fa8-840f-534ef70527fe" type="ANY" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="668cac16-2ec4-4493-beb7-2a5135d0a832" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[if(error.errorType.namespace as String == "CUSTOMER" or error.errorType.namespace as String == "CONTACT") 404 else 500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="3a82e6be-eb62-4975-81d1-8ff45d1294e1" name="csf-logger-failure-response-sent" />
+		</on-error-propagate>
+	</error-handler>
+	<error-handler name="api-console-error-handler" doc:id="7d472e35-f397-40cc-843c-4bbb4791fbe5">
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3c925072-e318-484b-800f-da7e9ce58f2b" type="APIKIT:NOT_FOUND">
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="f8f7855c-3f62-4b2c-bd6d-0db6b85968d1">
+				<ee:message>
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="d5eb776e-5769-463c-a88f-c36d6598ba89" name="csf-logger-failure-response-sent" />
+		</on-error-propagate>
+	</error-handler>
+	<error-handler name="mq-subscriber-error-handler" doc:id="9f042f6c-905b-4bb3-b018-141170eed124" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4c5a4b33-fa4b-4aea-878f-7b24636fae31" type="MULE:RETRY_EXHAUSTED, HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS, HTTP:RETRY_EXHAUSTED" >
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="36acb046-f340-4f7f-97af-db249ee5d714" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="a5ece119-f328-43e0-aac1-dbfc7b82f57d" name="csf-logger-failure-response-sent" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="683953e7-1f11-4d02-8a6f-4a196f267f56" type="ANY" >
+			<anypoint-mq:ack doc:name="Send Ack" doc:id="4437d1ce-b59e-4e50-a437-84557e944612" config-ref="anypointMQConfig" ackToken="#[vars.ackToken]" />
+			<ee:transform doc:name="DW Map Error Response Payload" doc:id="2fe02e80-acae-4ecd-92a4-f1034fe9837c" >
+				<ee:message >
+					<ee:set-payload resource="dwl/error/p-common-error.dwl" />
+				</ee:message>
+				<ee:variables >
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="csf-logger-failure-response-sent" doc:id="39996e79-565e-4227-a75f-581146deae0f" name="csf-logger-failure-response-sent" />
+			<async doc:name="Async" doc:id="2c309e37-3421-4fa4-b773-4e33afa73011" >
+				<flow-ref doc:name="csf-mq-publish-to-persistent-error-queue" doc:id="3e5783b7-ab03-448e-b0b8-669e9798047a" name="csf-mq-publish-to-persistent-error-queue" />
+			</async>
+		</on-error-propagate>
+	</error-handler>
+
+</mule>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+    <flow name="customer-accounts-papi-main">
+        <http:listener config-ref="apiHttpListenerConfig" path="/api/${api.majorVersion}/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="27c0ae54-d73a-46d7-9003-9af48383d5e5" variableName="flowName" />
+        <flow-ref doc:name="csf-set-global-attributes" doc:id="924c8daf-d6b4-4043-a8e4-82d064260bee" name="csf-set-global-attributes" />
+        <flow-ref doc:name="csf-logger-request-received" doc:id="30e9849b-24c0-42e2-a218-79abfdfbaa4e" name="csf-logger-request-received" />
+        <apikit:router config-ref="customer-accounts-papi-config" />
+        <set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="4650c7ba-c5ea-4d19-8021-1a2366eec2c2" variableName="flowName" />
+        <flow-ref doc:name="csf-logger-success-response-sent" doc:id="852abc3e-6887-42cb-86df-4dec56791f94" name="csf-logger-success-response-sent" />
+        <error-handler ref="api-error-handler" />
+    </flow>
+    <flow name="get:\ping:customer-accounts-papi-config">
+        <flow-ref doc:name="sf-check-ping-status" doc:id="90d977a6-fc97-436f-be05-59ef51beb3ea" name="sf-check-ping-status" />
+    </flow>
+    <flow name="get:\accounts:customer-accounts-papi-config">
+        <flow-ref doc:name="mf-impl-get-accounts" doc:id="67731a4c-f383-4d0d-aaca-e77f5476afc9" name="mf-impl-get-accounts" />
+    </flow>
+    <flow name="post:\accounts:application\json:customer-accounts-papi-config">
+        <flow-ref doc:name="mf-impl-post-account" doc:id="185c28f8-fb25-4f4d-a14c-5086f22ce9e9" name="mf-impl-post-account" />
+    </flow>
+    <flow name="patch:\accounts:application\json:customer-accounts-papi-config">
+        <flow-ref doc:name="mf-impl-patch-account" doc:id="8b9687ec-df1f-4e71-a092-f21f77d88279" name="mf-impl-patch-account" />
+    </flow>
+</mule>

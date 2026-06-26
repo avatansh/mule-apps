@@ -1,0 +1,268 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"shippingLatitude": {
+			"type": "string"
+		},
+		"lastModifiedDate": {
+			"type": "string"
+		},
+		"billingCity": {
+			"type": "string"
+		},
+		"jigsawCompanyId": {
+			"type": "string"
+		},
+		"slaC": {
+			"type": "string"
+		},
+		"type": {
+			"type": "string"
+		},
+		"naicsCode": {
+			"type": "string"
+		},
+		"name": {
+			"type": "string"
+		},
+		"industry": {
+			"type": "string"
+		},
+		"createdById": {
+			"type": "string"
+		},
+		"tickerSymbol": {
+			"type": "string"
+		},
+		"billingGeocodeAccuracy": {
+			"type": "string"
+		},
+		"accountSource": {
+			"type": "string"
+		},
+		"billingPostalCode": {
+			"type": "string"
+		},
+		"dandbCompanyId": {
+			"type": "string"
+		},
+		"photoUrl": {
+			"type": "string"
+		},
+		"masterRecordId": {
+			"type": "string"
+		},
+		"isDeleted": {
+			"type": "string"
+		},
+		"lastViewedDate": {
+			"type": "string"
+		},
+		"shippingGeocodeAccuracy": {
+			"type": "string"
+		},
+		"dunsNumber": {
+			"type": "string"
+		},
+		"sic": {
+			"type": "string"
+		},
+		"shippingStreet": {
+			"type": "string"
+		},
+		"cleanStatus": {
+			"type": "string"
+		},
+		"shippingPostalCode": {
+			"type": "string"
+		},
+		"yearStarted": {
+			"type": "string"
+		},
+		"createdDate": {
+			"type": "string"
+		},
+		"customerPriorityC": {
+			"type": "string"
+		},
+		"shippingState": {
+			"type": "string"
+		},
+		"id": {
+			"type": "string"
+		},
+		"sicDesc": {
+			"type": "string"
+		},
+		"billingState": {
+			"type": "string"
+		},
+		"annualRevenue": {
+			"type": "string"
+		},
+		"jigsaw": {
+			"type": "string"
+		},
+		"activeC": {
+			"type": "string"
+		},
+		"site": {
+			"type": "string"
+		},
+		"ownership": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"rating": {
+			"type": "string"
+		},
+		"website": {
+			"type": "string"
+		},
+		"lastReferencedDate": {
+			"type": "string"
+		},
+		"billingLatitude": {
+			"type": "string"
+		},
+		"numberOfEmployees": {
+			"type": "string"
+		},
+		"billingAddress": {
+			"type": "object",
+			"properties": {
+				"country": {
+					"type": "string"
+				},
+				"city": {
+					"type": "string"
+				},
+				"countryCode": {
+					"type": "string"
+				},
+				"street": {
+					"type": "string"
+				},
+				"latitude": {
+					"type": "string"
+				},
+				"postalCode": {
+					"type": "string"
+				},
+				"geocodeAccuracy": {
+					"type": "string"
+				},
+				"stateCode": {
+					"type": "string"
+				},
+				"state": {
+					"type": "string"
+				},
+				"longitude": {
+					"type": "string"
+				}
+			}
+		},
+		"ownerId": {
+			"type": "string"
+		},
+		"slaserialNumberC": {
+			"type": "string"
+		},
+		"billingLongitude": {
+			"type": "string"
+		},
+		"tradestyle": {
+			"type": "string"
+		},
+		"phone": {
+			"type": "string"
+		},
+		"numberofLocationsC": {
+			"type": "string"
+		},
+		"upsellOpportunityC": {
+			"type": "string"
+		},
+		"shippingCountry": {
+			"type": "string"
+		},
+		"shippingCity": {
+			"type": "string"
+		},
+		"parentId": {
+			"type": "string"
+		},
+		"naicsDesc": {
+			"type": "string"
+		},
+		"accountNumber": {
+			"type": "string"
+		},
+		"systemModstamp": {
+			"type": "string"
+		},
+		"billingCountry": {
+			"type": "string"
+		},
+		"slaexpirationDateC": {
+			"type": "string"
+		},
+		"billingStreet": {
+			"type": "string"
+		},
+		"shippingAddress": {
+			"type": "object",
+			"properties": {
+				"country": {
+					"type": "string"
+				},
+				"city": {
+					"type": "string"
+				},
+				"countryCode": {
+					"type": "string"
+				},
+				"street": {
+					"type": "string"
+				},
+				"latitude": {
+					"type": "string"
+				},
+				"postalCode": {
+					"type": "string"
+				},
+				"geocodeAccuracy": {
+					"type": "string"
+				},
+				"stateCode": {
+					"type": "string"
+				},
+				"state": {
+					"type": "string"
+				},
+				"longitude": {
+					"type": "string"
+				}
+			}
+		},
+		"lastActivityDate": {
+			"type": "string"
+		},
+		"fax": {
+			"type": "string"
+		},
+		"lastModifiedById": {
+			"type": "string"
+		},
+		"shippingLongitude": {
+			"type": "string"
+		}
+	},
+	"required": [
+		"name"
+	]
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<import file="health-common.xml"/>
+	<sub-flow name="check-all-dependencies-are-alive" doc:id="1c88c305-6170-42c9-9287-df040e461fad" >
+		<ee:transform doc:name="DW Read Health Check Query" doc:id="e31dde41-c0f2-4c30-af9d-59aeeb4034c4" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[p('healthCheck.query')]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:query doc:name="Query Salesforce" doc:id="d0b17f4e-bc1b-4b15-b1ed-cc7a9f350224" config-ref="salesforceConfig">
+			<salesforce:salesforce-query ><![CDATA[#[payload]]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="DW Convert to JSON" doc:id="ed14224b-57ce-4582-a2ab-d33c1fa1283c">
+			<ee:message>
+				<ee:set-payload resource="dwl/common/p-common-convert-to-json.dwl" />
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="DW Map Health Check Response" doc:id="6305ee2b-3657-4ce0-a95a-63eca93de18c" >
+			<ee:message >
+				<ee:set-payload resource="dwl/health/p-health-check-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sf-check-ping-status" doc:id="c881fbb6-3e82-4c36-b434-d0b2f52d4b39" >
+		<flow-ref doc:name="check-all-dependencies-are-alive" doc:id="a8998b67-41c8-42c0-aae3-b3b1a6a1bef6" name="check-all-dependencies-are-alive"/>
+	</sub-flow>
+</mule>

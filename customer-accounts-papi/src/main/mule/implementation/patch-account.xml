@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-patch-account" doc:id="4c8dd161-2c5b-4da9-8d56-9b0482118226" >
+		<flow-ref doc:name="sf-check-account" doc:id="86976922-1b84-49f4-a080-3e62e7a47c7e" name="sf-check-account" target="sfCheckAcct"/>
+		<ee:transform doc:name="PV SET path, method and Map Request Payload" doc:id="4fa4c118-2702-452f-8143-2480029a9a6b" >
+			<ee:message >
+				<ee:set-payload resource="dwl/p-patch-account-request.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[p('sapi.accounts.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA[p('method.update')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-sf-sapi" doc:id="9911ac29-7005-4939-8bbc-905dc13110d3" name="cf-request-sf-sapi" />
+	</sub-flow>
+	<sub-flow name="sf-check-account" doc:id="d9115262-18f6-4650-aa49-8c808deaaadd" >
+		<ee:transform doc:name="PV SET queryParams" doc:id="8a3d57c2-d5c3-4504-99f3-f0106b235cd1">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="dwl/v-set-query-params.dwl" variableName="queryParams" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="csf-get-account" doc:id="b37860ad-da02-484f-82d3-645e2a7700fc" name="csf-get-account" target="sfGetAcct"/>
+		<choice doc:name="Check if Account Exists" doc:id="44ef2c0b-b7e7-4a62-916b-401bc1fda21b" >
+			<when expression="#[!isEmpty(vars.sfGetAcct)]" >
+				<set-payload value="#[vars.sfGetAcct[0].id]" doc:name="Set AccountId" doc:id="039f5bf2-82c1-494f-8cb1-9a16f1814a04" />
+			</when>
+			<otherwise >
+				<raise-error doc:name="Account Not Found Error" doc:id="8dcb26e7-7e73-4b51-852d-9d0448ec18a2" type="ACCOUNT:NOT_FOUND" description="Account with this Name is not Found" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

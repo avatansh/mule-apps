@@ -1,0 +1,27 @@
+tls.keystore:
+  password: "![c72bREVng+8ns4IMHA/S2Q==]"
+  keyPassword: "![c72bREVng+8ns4IMHA/S2Q==]"
+  
+mq:
+  client:
+    id: "![IM2JcAg8I3oFhoGidBsmiSyGImgRqqGzwc/YPGzKthsDet434fLRfw==]"
+    secret: "![f0od4x82C9zXNS9NF/Oj/Gg8a1ZN6tKbVc5309L2eWAFhji+rZzlJQ==]"
+
+anypoint:
+  orgId: "![msNThfpxlcm/uWBorqVTpljR2TZA9BKU43mM4I29ofdrVl+IalICCA==]"
+  envId: "![+SEHA1I8iU4r3nj7jG6cm0I/IkYMONuh6z6N+7R844ecNKEgPoNA7A==]"
+  client:
+    id: "![kQHwyM+9gSkErmiNTG58VYs9YCHDb84i6UiQ/1MpCAVss4KJMNNcUQ==]"
+    secret: "![tIlPDyUudxICM3V7jIKiU8+S2Pv7QJCgF6LkBM1rv6Y8adpw1gLySg==]"
+
+sms:
+  from: "![TvBIfD2U/9cr7cOGKay01A==]"
+  to: "![rAro47F00ORQY3N7P1iIpg==]"
+  
+email:
+    from: "![z5+O5+ZM9zszwmBvFX3EmOquhpvMzLBWbB4tgxDn3zQ=]"
+    to: "![z5+O5+ZM9zszwmBvFX3EmAvRyUvwqdjOd1YOQkApquk=]"
+    
+app:
+  clientId: "![u51iV2pbT4CgU+aCKxOH54MaQHqYg/lg28STLqA5sktF3vCKi9RhrQ==]"
+  clientSecret: "![DfuvXF5R2hGC0/BMM8Ivy9pxFGLgwAF0+DwpXypub1/o90bxgmO4dA==]"

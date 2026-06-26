@@ -1,0 +1,12 @@
+api:
+  id: ""
+
+tls.keystore:
+  type:        "pkcs12"
+  path:        "certs/customer-sfdc-sapi.p12"
+  alias:       "server"
+
+sfdc:
+  reconnect:
+    frequency: "2000"
+    attempts: "2"

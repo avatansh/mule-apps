@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+<flow name="mf-subscribe-accounts-queue" doc:id="e687169e-9348-4283-ad5b-edc4530c10d1" maxConcurrency="1">
+		<anypoint-mq:subscriber doc:name="Subscriber accounts-q" doc:id="3bff1139-3e0e-4f1f-be24-b257ca18fbc4" config-ref="anypointMQConfig" destination="accounts-q" acknowledgementMode="MANUAL" acknowledgementTimeout="${subscriber.ackTimeout}">
+			<anypoint-mq:subscriber-type >
+				<anypoint-mq:prefetch maxLocalMessages="1" />
+			</anypoint-mq:subscriber-type>
+		</anypoint-mq:subscriber>
+		<json-logger:logger doc:name="LOG INFO Start" doc:id="9d09b567-fdec-4e6c-8f07-86ea3e4c305c" config-ref="jsonLoggerConfig" message='#["Message Received from account-q"]'>
+			<json-logger:content ><![CDATA[""]]></json-logger:content>
+		</json-logger:logger>
+		<set-variable value="#[attributes.ackToken]" doc:name="PV Set ackToken" doc:id="5827ca6a-bf99-47d5-99e1-96e78b820dc2" variableName="ackToken"/>
+		<set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="56a95c7a-8764-4e94-b914-f61f97657389" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-received" doc:id="19a3a0fc-e125-4f3b-801f-b5d901e48146" name="csf-logger-request-received" />
+		<flow-ref doc:name="sf-validate-payload" doc:id="d65b5b7a-d2ad-4214-b692-1bd1b00497aa" name="sf-validate-payload"/>
+		<flow-ref doc:name="sf-process-messages" doc:id="28cb1fb7-94fe-4565-a6f2-a4a5bc4f8286" name="sf-process-messages"/>
+		<set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="e753481e-d519-468c-bf31-22911eaf5834" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-success-response-sent" doc:id="804c0a73-ef69-4c43-9763-85d76bfce0ee" name="csf-logger-success-response-sent" />
+		<anypoint-mq:ack doc:name="Send Ack" doc:id="b52f16a9-2df2-4cbb-9129-38e38847cc31" config-ref="anypointMQConfig" ackToken="#[vars.ackToken]"/>
+		<json-logger:logger doc:name="LOG INFO End" doc:id="03acf4d6-b7e3-4abc-afd5-d60b0b1e3909" config-ref="jsonLoggerConfig" message='#["Message Processed"]' tracePoint="END">
+			<json-logger:content ><![CDATA[""]]></json-logger:content>
+		</json-logger:logger>
+		<error-handler ref="mq-subscriber-error-handler" />
+	
+</flow>
+	<sub-flow name="sf-validate-payload" doc:id="b861cbe6-ffe3-40ca-81aa-db52b2fe5592" >
+		<ee:transform doc:name="DW Payload Array to Object" doc:id="19387494-57e4-4520-ae40-6c7f7880da1d">
+			<ee:message>
+				<ee:set-payload resource="dwl/p-array-to-object.dwl" />
+			</ee:message>
+		</ee:transform>
+		<json:validate-schema doc:name="Validate Account JSON" doc:id="b969653f-b93f-466f-9dde-22ba372ad5c8" schema="schemas/AccountsSchema.json" />
+	</sub-flow>
+	<sub-flow name="sf-process-messages" doc:id="3eafa796-9893-4d7f-a11c-9ffe00d91dc3" >
+		<choice doc:name="Check Contact Preference" doc:id="c19c88db-5da6-4e29-99a7-a94defb6fa0b">
+			<when expression='#[upper(payload.contactPreference) == "EMAIL"]'>
+				<flow-ref doc:name="sf-process-email" doc:id="ef0dc1dd-4c83-476a-b422-836bac915fd3" name="sf-process-email" />
+			</when>
+			<when expression='#[upper(payload.contactPreference) == "PHONE"]'>
+				<flow-ref doc:name="sf-process-sms" doc:id="1018f68e-7d79-425a-a0e6-cbc6830d7c9e" name="sf-process-sms" />
+			</when>
+			<when expression='#[upper(payload.contactPreference) == "BOTH"]'>
+				<scatter-gather doc:name="Scatter-Gather" doc:id="32011902-389b-41f3-b6c2-edeca5b1c425" >
+					<route >
+						<flow-ref doc:name="sf-process-sms" doc:id="bbaf9f69-de47-4a88-baa5-c739c2d8ff50" name="sf-process-sms" />
+					</route>
+					<route >
+						<flow-ref doc:name="sf-process-email" doc:id="16156221-be86-416c-8235-29b9b5547101" name="sf-process-email" />
+					</route>
+				</scatter-gather>
+			</when>
+			<otherwise>
+				<flow-ref doc:name="sf-process-email" doc:id="3fbf2b70-3259-41e7-8b05-b93a5b4ddf70" name="sf-process-email" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

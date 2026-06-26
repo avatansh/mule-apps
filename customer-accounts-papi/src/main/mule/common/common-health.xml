@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<import file="health-common.xml"/>
+	<sub-flow name="check-all-dependencies-are-alive" doc:id="cc17e78d-45c4-465e-bfd2-d4c7bc92bb62">
+		<ee:transform doc:name="FV SET Method and Path" doc:id="fe37c98c-6da5-46f5-9a11-867e30cbaef8">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[p('common.health.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[p('method.retrieve')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-sf-sapi" doc:id="91e343ec-acb3-4fad-807c-0c47affae0fc" name="cf-request-sf-sapi" />
+		<ee:transform doc:name="DW Map Health Check Response" doc:id="95e0bbde-ee74-4529-9dd8-d06a39e038fc" >
+			<ee:message >
+				<ee:set-payload resource="dwl/health/p-health-check-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sf-check-ping-status" doc:id="9944da9e-5f24-404f-9e14-6832f5b9e6a4" >
+		<ee:transform doc:name="FV SET Method and Path" doc:id="a3de9f41-acac-4e96-9eef-afed0ef00e1f" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[p('common.ping.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA[p('method.retrieve')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="d749a86b-ee30-4a13-b285-1aca3073a4bb">
+			<route>
+				<flow-ref doc:name="cf-request-twilio-sapi" doc:id="8476fb02-077a-4266-beb2-84908b13c751" name="cf-request-twilio-sapi" />
+			</route>
+			<route>
+				<flow-ref doc:name="cf-request-gmail-sapi" doc:id="3965cf16-554f-46d4-ac83-d49070214882" name="cf-request-gmail-sapi" />
+			</route>
+			<route >
+				<flow-ref doc:name="cf-request-sf-sapi" doc:id="a8d533cc-cb11-4f91-92ab-9a07bd9bff99" name="cf-request-sf-sapi"/>
+			</route>
+		</scatter-gather>
+		<ee:transform doc:name="DW Map Ping Response" doc:id="478a20a1-76f7-44b6-bfc3-91d5b789a953" >
+			<ee:message >
+				<ee:set-payload resource="dwl/health/p-ping-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

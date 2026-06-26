@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<sub-flow name="csf-set-global-attributes" doc:id="4438e27b-f870-4dc5-8796-9f8daeebfd06">
+		<ee:transform doc:name="PVs SET globalTranId, externalTranId, muleTranId" doc:id="2abb5be0-0f55-4afc-a241-aa62c406795d">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="dwl/common/v-common-externalTranId.dwl" variableName="externalTranId" />
+				<ee:set-variable resource="dwl/common/v-common-muleTranId.dwl" variableName="muleTranId" />
+				<ee:set-variable resource="dwl/common/v-common-globalTranId.dwl" variableName="globalTranId" />
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="csf-get-account" doc:id="5dd890b1-2c51-4af1-9f99-b2649d8f4f01">
+		<ee:transform doc:name="FV SET method and path" doc:id="f2090bc9-d13f-4c37-b34d-bca05f83cd59">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[p('sapi.accounts.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[p('method.retrieve')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-sf-sapi" doc:id="ff914f77-b763-4f42-a574-19250b718a13" name="cf-request-sf-sapi" />
+		<choice doc:name="Check if Account Exists" doc:id="9f0c4c42-3cbb-4e37-8455-1a0865aa49e9">
+			<when expression="#[!isEmpty(payload)]">
+				<logger level="INFO" doc:name="LOG INFO Account is Present" doc:id="e52e153b-d081-4cb9-aef7-78d16769e59a" message='#["Found Salesforce Account"]' />
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="LOG INFO Account is Not Present" doc:id="d8f72fdb-2f93-4e29-85dc-25411fa9d254" message='#["Not Found Salesforce Account"]' />
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<flow name="cf-request-sf-sapi" doc:id="31ff2776-9c94-4c24-862c-68309cb88c2e" >
+		<set-variable value="#[flow.name]" doc:name="FV SET flowName" doc:id="1bb80711-7010-4c56-87df-7bf6d68238fa" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-sent" doc:id="07ade4d5-cf2f-4230-b125-5e090d417344" name="csf-logger-request-sent" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Before Invoking Process API" doc:id="ee35c292-daf2-419f-be93-018f241c843c" message="#[payload]" />
+		<choice doc:name="Check If Query Params Present" doc:id="7049191c-3533-41d5-8bc7-0dd436d957e9" >
+			<when expression="#[vars.queryParams != null]">
+				<http:request method="#[vars.method]" doc:name="Request SFDC SAPI" doc:id="e4d9d828-2a17-4ea1-aa0e-4d848d6c7ee1" config-ref="sfSapiHttpsRequestConfiguration" path="#[vars.path]" sendCorrelationId="AUTO" >
+					<http:query-params ><![CDATA[#[output application/java
+---
+vars.queryParams]]]></http:query-params>
+				</http:request>
+			</when>
+			<otherwise >
+				<http:request method="#[vars.method]" doc:name="Request SFDC SAPI" doc:id="8a28aa26-58b7-46ab-876a-4e67b9d61093" config-ref="sfSapiHttpsRequestConfiguration" path="#[vars.path]" sendCorrelationId="AUTO">
+		</http:request>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="LOG DEBUG After Invoking Process API" doc:id="616fd8d5-e5f7-42f1-b006-b24fbbe28b06" message="#[payload]" />
+		<flow-ref doc:name="csf-logger-success-response-received" doc:id="5f4448df-de60-4d6d-ac28-b5d953057739" name="csf-logger-success-response-received" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b26b9f42-bcde-4d12-b05d-825c99f4a3f2" >
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="2aa89073-9235-4a87-a1d4-31f490bda30a" name="csf-logger-failure-response-received" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="cf-request-twilio-sapi" doc:id="0a01c557-4ad0-43e0-b2a0-3f7256b9a3e9" >
+		<set-variable value="#[flow.name]" doc:name="FV SET flowName" doc:id="b511401b-0767-443f-bf8c-22244051a3da" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-sent" doc:id="a89b30e3-0b40-4640-ada7-2151b1722b14" name="csf-logger-request-sent" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Before Invoking Process API" doc:id="b6f1a425-8ece-4a43-a577-751d3576b77f" message="#[payload]" />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="445f191f-9cac-47d0-8b86-188ddabe013f" millisBetweenRetries="2000">
+			<try doc:name="Try" doc:id="aa621885-288d-405b-bb14-76d06c3c203f" >
+				<http:request method="#[vars.method]" doc:name="Request Twilio System API" doc:id="370da8ac-9fa1-4d6c-bfaa-332aa740345e" config-ref="twilioSapiHttpsRequestConfig" path="#[vars.path]">
+		</http:request>
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="0585bd82-32d3-4ed6-b49d-c91fd28b90aa" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS" >
+						<flow-ref doc:name="csf-logger-failure-response-received" doc:id="0f586abb-9dd7-44f2-87ec-a6945c5212d2" name="csf-logger-failure-response-received" />
+					</on-error-propagate>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="14e7b665-6325-47d9-95da-72e50b71574b" type="ANY" >
+						<flow-ref doc:name="csf-logger-failure-response-received" doc:id="44d4090b-80ee-4aa3-83bc-18cd9327a3ce" name="csf-logger-failure-response-received" />
+						<async doc:name="Async" doc:id="1c000949-415c-42a6-9486-7697da84f809" >
+							<set-payload value="#[vars.acctReq]" doc:name="Set Payload" doc:id="ff339411-440f-4b88-a585-73ff35892776" />
+							<flow-ref doc:name="csf-mq-publish-to-persistent-error-queue" doc:id="c0ea49e0-cda9-42af-b5a8-5eeef2fd37d0" name="csf-mq-publish-to-persistent-error-queue" />
+						</async>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</until-successful>
+		<logger level="INFO" doc:name="LOG DEBUG After Invoking Process API" doc:id="f13304de-4456-449c-bf17-9005d296d7be" message="#[payload]" />
+		<flow-ref doc:name="csf-logger-success-response-received" doc:id="bdd79172-a403-4bfe-a078-82212958c621" name="csf-logger-success-response-received" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cad9e889-0b8d-4d08-9523-917a5d23089a" type="MULE:RETRY_EXHAUSTED" >
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="96c44337-0cc2-4bef-8ee3-1b41429a290a" name="csf-logger-failure-response-received" />
+				<async doc:name="Async" doc:id="3d8ad413-6f2f-47e1-8cb4-a4cab1cc928b" >
+					<set-payload value="#[vars.acctReq]" doc:name="Set Payload" doc:id="c6cda724-42ee-4a57-97d4-4ba3a051b442" />
+					<flow-ref doc:name="csf-mq-publish-to-transient-error-queue" doc:id="73313da2-0447-4694-a5c1-120aeda0f469" name="csf-mq-publish-to-transient-error-queue" />
+				</async>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="352ecdd6-e266-4de7-9b18-7a440a57e943" type="ANY" >
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="d0ca12e7-aaff-484c-b126-59b3491fcf09" name="csf-logger-failure-response-received" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="cf-request-gmail-sapi" doc:id="7b1951e0-0459-4b9d-9e99-33975f23437f" >
+		<set-variable value="#[flow.name]" doc:name="FV SET flowName" doc:id="7c369110-24e0-4be5-8bf3-60df53998643" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-sent" doc:id="d4533663-f4b8-4b2b-97cb-d990463f0438" name="csf-logger-request-sent" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Before Invoking Process API" doc:id="52139d87-fe98-4558-9a5e-63247b8684c8" message="#[payload]" />
+		<until-successful maxRetries="2" doc:name="Until Successful" doc:id="974a4fc6-0f00-42cc-915f-3042946ad4bb" millisBetweenRetries="2000">
+				<try doc:name="Try" doc:id="896501d6-9f36-471a-b1c8-3c33c7e3b9f3" >
+				<http:request method="#[vars.method]" doc:name="Request Gmail System API" doc:id="350f146d-b91c-467b-9b5d-ef9b743148fa" config-ref="gmailSapiHttpsRequestConfig" path="#[vars.path]">
+		</http:request>
+				<error-handler >
+					<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="e69b00e9-0b47-4187-884a-b272287262b5" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT, HTTP:TOO_MANY_REQUESTS">
+						<flow-ref doc:name="csf-logger-failure-response-received" doc:id="283446fa-70dd-4a92-b044-5344685980c5" name="csf-logger-failure-response-received" />
+					</on-error-propagate>
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ecd7e594-a1d5-4c2e-abc7-b3f6ddf9431e" type="ANY">
+						<flow-ref doc:name="csf-logger-failure-response-received" doc:id="ed7e4ce9-b8d6-4f31-8799-3a3763679b03" name="csf-logger-failure-response-received" />
+						<async doc:name="Async" doc:id="64b05795-be54-4140-91df-0c8d77c1127c" >
+							<set-payload value="#[vars.acctReq]" doc:name="Set Payload" doc:id="eb52bd0c-4234-4533-bc84-64f86e646d7d" />
+							<flow-ref doc:name="csf-mq-publish-to-persistent-error-queue" doc:id="0e57c271-352f-4125-92f8-6f400f5141cd" name="csf-mq-publish-to-persistent-error-queue" />
+						</async>
+					</on-error-continue>
+				</error-handler>
+			</try>
+			</until-successful>
+		<logger level="INFO" doc:name="LOG DEBUG After Invoking Process API" doc:id="9c0301e0-0f49-40ff-bc6c-8b4566017801" message="#[payload]" />
+		<flow-ref doc:name="csf-logger-success-response-received" doc:id="bb1f14f5-91c2-4fbe-9581-54b542186f28" name="csf-logger-success-response-received" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6f335e16-ec63-4c17-8f2b-8a37c716564a" type="HTTP:RETRY_EXHAUSTED">
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="d6c36ce3-c1ed-4691-9865-199cf7c29220" name="csf-logger-failure-response-received" />
+				<async doc:name="Async" doc:id="b964f30e-ef5f-4785-9d7c-1426698bf7b1">
+					<set-payload value="#[vars.acctReq]" doc:name="Set Payload" doc:id="ffe4523c-2c23-4f0e-aa54-5ba2b6c69336" />
+					<flow-ref doc:name="csf-mq-publish-to-transient-error-queue" doc:id="6d3f832e-dd42-49b9-8098-35d89277dc43" name="csf-mq-publish-to-transient-error-queue" />
+				</async>
+			</on-error-propagate>
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="80f7d966-8dae-43c8-8dad-4edaa2791372" type="ANY">
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="477369e2-4806-47e5-a32e-04a4bac87117" name="csf-logger-failure-response-received" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<sub-flow name="csf-mq-publish-to-transient-error-queue" doc:id="7810e4ff-346e-4959-ae63-6228a3b66488">
+		<try doc:name="Try" doc:id="81cc3e08-d0b2-4077-bf3f-06f45cdd588b">
+			<anypoint-mq:publish doc:name="Publish to Transient Error Queue" doc:id="66912cb5-0d88-463a-9e42-59b7dc619a06" config-ref="anypointMQConfig" destination="#[p('queue.error.transient')]" />
+			<error-handler>
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="854d73ce-d937-4592-ab24-0b93fdf1299e" type="ANY">
+					<json-logger:logger doc:name="LOG ERROR" doc:id="ff7960c4-e389-49a9-b7de-c050d7367519" config-ref="jsonLoggerConfig" message='#["Error Occurred While Publishing to Transient Error Queue"]' tracePoint="EXCEPTION" priority="ERROR">
+						<json-logger:content ><![CDATA[""]]></json-logger:content>
+					</json-logger:logger>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<sub-flow name="csf-mq-publish-to-persistent-error-queue" doc:id="6765cdee-2f6a-4be0-8a6c-76929f1d42ec" >
+		<try doc:name="Try" doc:id="9065890b-0693-428c-97d6-291d14806581" >
+			<anypoint-mq:publish doc:name="Publish to Pesistent Error Queue" doc:id="3964103f-e13d-4e44-b98c-3f1c719c0ec2" config-ref="anypointMQConfig" destination="#[p('queue.error.persistent')]" />
+			<error-handler >
+				<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="db92f3b4-bae5-4d93-b687-868c9c9ca8c3" type="ANY" >
+					<json-logger:logger doc:name="LOG ERROR" doc:id="f1526c91-e0d2-4f62-8cdb-7e4c2b0abf32" config-ref="jsonLoggerConfig" message='#["Error Occured While Publishing to Persistent Error Queue"]' tracePoint="EXCEPTION" priority="ERROR" >
+						<json-logger:content ><![CDATA[""]]></json-logger:content>
+					</json-logger:logger>
+				</on-error-propagate>
+			</error-handler>
+		</try>
+	</sub-flow>
+</mule>

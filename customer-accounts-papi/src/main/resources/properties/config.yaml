@@ -1,0 +1,47 @@
+app:
+  name:    "customer-accounts-papi"
+  version: "1.0.0-SNAPSHOT"
+
+api:
+  groupId:      "${api.groupId}"
+  artifactId:   "${api.artifactId}"
+  version:      "${api.version}"
+  majorVersion: "v1"
+
+https:
+  host: "0.0.0.0"
+  port: ""
+  read:
+    timeout: "70000"
+  idle:
+    timeout: "60000"
+
+source: "Loves Travel Stop"
+target: "SFDC"
+
+common:
+  health:
+    path: "/ready"
+  ping:
+    path: "/api/v1/ping"
+
+method:
+  retrieve: "GET"
+  create: "POST"
+  update: "PATCH"
+
+sapi:
+  contacts:
+    path: "/api/v1/contacts"
+  accounts:
+    path: "/api/v1/accounts"
+  email:
+    path: "/api/v1/email"
+  sms:
+    path: "/api/v1/sms"
+
+json:
+  logger:
+    application:
+      name: "customer-accounts-papi"
+      version: "1.0.0"

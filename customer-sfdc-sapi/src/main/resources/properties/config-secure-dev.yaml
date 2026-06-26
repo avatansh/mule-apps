@@ -1,0 +1,8 @@
+tls.keystore:
+  password: "![c72bREVng+8ns4IMHA/S2Q==]"
+  keyPassword: "![c72bREVng+8ns4IMHA/S2Q==]"
+  
+sfdc:
+  username: "![z5+O5+ZM9zszwmBvFX3EmM/oD6N2yEsK3frjJQvmbV0e0rZt9fxGNGVAFMkZu0oI]"
+  password: "![I67ySkrWkR4v3ni2mNGqZw==]"
+  token: "![HNUvcAiGuUqk+rDI35sZoodzh71n62vO3JIzi89ct1E=]"

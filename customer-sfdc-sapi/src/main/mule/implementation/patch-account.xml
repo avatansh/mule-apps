@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-patch-account" doc:id="f24d40a2-3ae3-4ca9-a54b-083e3b4610e7" >
+		<ee:transform doc:name="PV SET objectType and Map Request Payload" doc:id="d64af593-174c-4f9f-b53b-98b12cb35342" >
+			<ee:message >
+				<ee:set-payload resource="dwl/p-patch-account-request.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="objectType" ><![CDATA[p('objectType.account')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-update-sfdc" doc:id="e66ae368-786d-493f-93d0-b8b7f32235a6" name="cf-update-sfdc" />
+		<choice doc:name="Check if Status is Success" doc:id="96d5ed51-49b9-4ca3-a31f-d7b66b2c5f8c" >
+			<when expression="#[payload.items[0].successful]" >
+				<logger level="INFO" doc:name="LOG INFO Success from SFDC" doc:id="ee75f1c7-90b5-4232-b359-f883027586d6" message='#["Recieved Status as Successful from Salesforce"]' />
+			</when>
+			<otherwise >
+				<raise-error doc:name="Salesforce Error" doc:id="beb35d34-1949-48b7-a2c5-b017f283fe37" type="CUSTOM:ERROR" description="#[payload.items[0].message]" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

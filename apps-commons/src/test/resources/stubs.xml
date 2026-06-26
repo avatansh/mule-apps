@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="check-all-dependencies-are-alive" doc:id="6d1b8618-16a9-4746-9d4d-37789c295443" >
+		<logger level="INFO" doc:name="Logger" doc:id="0c5a4045-5ef6-4dc3-9787-ad33c3281c95" />
+	</sub-flow>
+	<sub-flow name="sf-log-error-and-send" doc:id="dd19b841-dd56-4e2d-8ce7-35fd48c462d9" >
+		<logger level="ERROR" doc:name="Logger" doc:id="dbf1cb2f-df89-4f01-af4a-89b1f041c43f" message="#[payload]" />
+	</sub-flow>
+</mule>

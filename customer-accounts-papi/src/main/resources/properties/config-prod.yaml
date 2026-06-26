@@ -1,0 +1,41 @@
+api:
+  id: ""
+
+tls.keystore:
+  type:        "pkcs12"
+  path:        "certs/customer-accounts-papi.p12"
+  alias:       "server"
+
+request:
+  config:
+    sapi:
+      sf:
+        host: ""
+        port: ""
+        response:
+          timeout: "60000"
+        idle:
+          timeout: "50000"
+        retry:
+          frequency: "2000"
+          attempts: "2"
+      twilio:
+        host: ""
+        port: ""
+        response:
+          timeout: "60000"
+        idle:
+          timeout: "50000"
+        retry:
+          frequency: "2000"
+          attempts: "2"
+      gmail:
+        host: ""
+        port: ""
+        response:
+          timeout: "60000"
+        idle:
+          timeout: "50000"
+        retry:
+          frequency: "2000"
+          attempts: "2"

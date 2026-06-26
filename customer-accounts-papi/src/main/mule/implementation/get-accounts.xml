@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-get-accounts" doc:id="5f27d349-cdda-43bf-a89f-912637c9310e" >
+		<choice doc:name="Check for Query Params" doc:id="7f8981b9-3b4e-46d2-8779-0cbc899046fb">
+			<when expression="#[(attributes.queryParams.accountName == null) and (attributes.queryParams.fromDate == null) and (attributes.queryParams.toDate == null)]">
+				<logger level="INFO" doc:name="LOG INFO No Query Params Present" doc:id="cacf680a-716c-4543-b238-2abedca90252" message='#["No Query Params Present"]' />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="PV SET queryParams" doc:id="2746c562-daf7-4c22-998a-1d9eb8a95d13">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable resource="dwl/common/v-common-get-query-params.dwl" variableName="queryParams" />
+			</ee:variables>
+		</ee:transform>
+			</otherwise>
+		</choice>
+		<flow-ref doc:name="csf-get-account" doc:id="e8a25f2a-1059-4c99-bde3-5c1fc43a82ed" name="csf-get-account"/>
+		<choice doc:name="Check if Account Exists" doc:id="fb63a18b-7db6-4bd2-891c-ce3f3a070d75" >
+			<when expression="#[!isEmpty(payload)]">
+				<logger level="INFO" doc:name="LOG INFO Account Found" doc:id="7e91f0fa-73ec-45ac-a69f-74f80eaecc9e" />
+			</when>
+			<otherwise >
+				<raise-error doc:name="Account Not Found Error" doc:id="aad1564b-3b83-4b0e-abb0-016b3a39527f" type="ACCOUNT:NOT_FOUND" description="Account with this Name is not Found" />
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

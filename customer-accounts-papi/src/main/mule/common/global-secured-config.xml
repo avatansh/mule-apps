@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+	<secure-properties:config name="secureEnvPropertiesConfig" doc:name="Secure Properties Config" doc:id="83b45623-2dac-4a14-9ea7-cb71412bcd9a" file="properties\config-secure-${env}.yaml" key="${encrypt.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<tls:context name="apiTLSContext" doc:name="TLS Context" doc:id="59673971-cb05-4af2-a16d-619ba6e759fa" >
+		<tls:trust-store insecure="true" />
+		<tls:key-store type="${tls.keystore.type}" path="${tls.keystore.path}" alias="${tls.keystore.alias}" keyPassword="${secure::tls.keystore.keyPassword}" password="${secure::tls.keystore.password}" />
+	</tls:context>
+	<anypoint-mq:config name="anypointMQConfig" doc:name="Anypoint MQ Config" doc:id="8e11eb4f-6b1d-4723-a142-46285c93ed57" >
+		<anypoint-mq:connection clientId="${secure::mq.client.id}" clientSecret="${secure::mq.client.secret}" url="https://mq-us-east-1.anypoint.mulesoft.com/api/v1/organizations/${secure::anypoint.orgId}/environments/${secure::anypoint.envId}">
+			<reconnection >
+				<reconnect frequency="${mq.reconnect.frequency}" count="${mq.reconnect.attempts}"/>
+			</reconnection>
+		</anypoint-mq:connection>
+	</anypoint-mq:config>
+</mule>

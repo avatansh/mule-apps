@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<sub-flow name="csf-set-global-attributes" doc:id="3eab9cda-07f0-4b8e-95e3-d40f18760115" >
+		<ee:transform doc:name="PVs SET globalTranId, externalTranId, muleTranId" doc:id="2f46bf67-9660-44ae-9c4f-25b0b506d5d8" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/common/v-common-externalTranId.dwl" variableName="externalTranId" />
+				<ee:set-variable resource="dwl/common/v-common-muleTranId.dwl" variableName="muleTranId" />
+				<ee:set-variable resource="dwl/common/v-common-globalTranId.dwl" variableName="globalTranId" />
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+</mule>

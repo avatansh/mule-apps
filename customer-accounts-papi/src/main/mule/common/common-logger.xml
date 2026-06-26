@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<sub-flow name="csf-logger-request-received" doc:id="f61d70df-d39f-48ad-a66d-4f1aae50cf63" >
+		<ee:transform doc:name="DW Map Logging Variable" doc:id="82a5eba1-1c34-4a8b-b598-d8bbb12fb70d">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable resource="dwl/log/logger-requestReceived.dwl" variableName="vLogMessage" />
+			
+</ee:variables>
+		</ee:transform>
+		<json-logger:logger doc:name="LOG Info Request Received" doc:id="5f218fcd-67bf-423f-8dca-421167abc72a" config-ref="jsonLoggerConfig" message='#["RequestReceived"]'>
+			<json-logger:content ><![CDATA[#[vars.vLogMessage]]]></json-logger:content>
+		</json-logger:logger>
+	
+</sub-flow>
+	<sub-flow name="csf-logger-success-response-sent" doc:id="4e51689d-5315-47a0-b0d1-9a9ab575f288" >
+		<ee:transform doc:name="DW Map Logging Variable" doc:id="634b4d1a-4eb5-4820-96c3-5eb77af1e5c5">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable resource="dwl/log/logger-successResponseSent.dwl" variableName="vLogMessage" />
+			
+</ee:variables>
+		</ee:transform>
+		<json-logger:logger doc:name="LOG Info Success Response Sent" doc:id="323407f8-60f5-4ebc-af7e-2f2dc5879dbb" config-ref="jsonLoggerConfig" message='#["SuccessResponseSent"]' tracePoint="END">
+			<json-logger:content ><![CDATA[#[vars.vLogMessage]]]></json-logger:content>
+		</json-logger:logger>
+	
+</sub-flow>
+	<sub-flow name="csf-logger-failure-response-sent" doc:id="55640676-c4f0-4b0a-8732-f072ee22ac0c" >
+		<ee:transform doc:name="DW Map Logging Variable" doc:id="f967ec2d-6c14-48ef-bcd6-287427f8d78d" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/log/logger-failureResponseSent.dwl" variableName="vLogMessage" />
+			
+</ee:variables>
+		</ee:transform>
+		<json-logger:logger doc:name="LOG Info Failure Response Sent" doc:id="cbd7df6d-c994-4cdd-bf24-292b0783e2b2" config-ref="jsonLoggerConfig" message='#["FailureResponseSent"]' tracePoint="END" >
+			<json-logger:content ><![CDATA[#[vars.vLogMessage]]]></json-logger:content>
+		</json-logger:logger>
+	
+</sub-flow>
+	<sub-flow name="csf-logger-request-sent" doc:id="7068d011-69cb-48db-af5e-10b840796f19" >
+		<ee:transform doc:name="DW Map Logging Variable" doc:id="3b419875-1ccf-4bdd-a448-e7070848fae1" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/log/logger-requestSent.dwl" variableName="vLogMessage" />
+			
+</ee:variables>
+		</ee:transform>
+		<json-logger:logger doc:name="LOG Info Request Sent" doc:id="54c97b9a-3a7e-4790-827b-05d28dd70358" config-ref="jsonLoggerConfig" message='#["RequestSent"]' tracePoint="FLOW" >
+			<json-logger:content ><![CDATA[#[vars.vLogMessage]]]></json-logger:content>
+		</json-logger:logger>
+	
+</sub-flow>
+	<sub-flow name="csf-logger-success-response-received" doc:id="58551476-9804-4159-865c-e18715c7dd59" >
+		<ee:transform doc:name="DW Map Logging Variable" doc:id="5a550c5b-c351-4d95-92b4-c98fadf26a5d" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/log/logger-successResponseReceived.dwl" variableName="vLogMessage" />
+			
+</ee:variables>
+		</ee:transform>
+		<json-logger:logger doc:name="LOG Info Success Response Received" doc:id="0ce352d8-a2a0-4b27-ae17-c90fa1cc221b" config-ref="jsonLoggerConfig" message='#["SuccessResponseReceived"]' tracePoint="FLOW" >
+			<json-logger:content ><![CDATA[#[vars.vLogMessage]]]></json-logger:content>
+		</json-logger:logger>
+	
+</sub-flow>
+	<sub-flow name="csf-logger-failure-response-received" doc:id="43f23826-cb55-4d14-bcab-c9b083ffbc91" >
+		<ee:transform doc:name="DW Map Logging Variable" doc:id="be8f6cf5-d197-40ea-ac49-2a94af4aee36" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable resource="dwl/log/logger-failureResponseReceived.dwl" variableName="vLogMessage" />
+			
+</ee:variables>
+		</ee:transform>
+		<json-logger:logger doc:name="LOG Info Failure Response Received" doc:id="41c237a8-0101-40a3-9d63-56b9c2252a7d" config-ref="jsonLoggerConfig" message='#["FailureResponseReceived"]' tracePoint="FLOW" >
+			<json-logger:content ><![CDATA[#[vars.vLogMessage]]]></json-logger:content>
+		</json-logger:logger>
+	
+</sub-flow>
+</mule>

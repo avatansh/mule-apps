@@ -1,0 +1,28 @@
+app:
+  name:    "customer-sfdc-sapi"
+  version: "1.0.0-SNAPSHOT"
+
+api:
+  groupId:      "${api.groupId}"
+  artifactId:   "${api.artifactId}"
+  version:      "${api.version}"
+  spec:         "resource::${api.groupId}:${api.artifactId}:${api.version}:raml:zip:customer-eapi.raml"
+  majorVersion: "v1"
+
+source: "Loves Travel Stop"
+target: "SFDC"
+
+https:
+  host: "0.0.0.0"
+  port: ""
+  read:
+    timeout: "50000"
+  idle:
+    timeout: "40000"
+
+healthCheck:
+  query: "SELECT Name FROM USER WHERE id = '0052w00000GQCK0AAP'"
+
+objectType:
+  account: "Account"
+  contact: "Contact"

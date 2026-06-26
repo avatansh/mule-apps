@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-get-accounts" doc:id="274d4287-100d-47de-9753-929e35ceaeb9" >
+		<ee:transform doc:name="PV SET queryParams" doc:id="b09fcc7c-2784-41ff-a568-f21baea657f8">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable resource="dwl/common/v-common-get-query-params.dwl" variableName="queryParams" />
+					</ee:variables>
+				</ee:transform>
+		<choice doc:name="Check if Account is Present" doc:id="005dc879-5f53-4989-8650-63daebeca6a2">
+			<when expression="#[(vars.queryParams.accountName == null) and (vars.queryParams.fromDate == null) and (vars.queryParams.toDate == null)]">
+				<ee:transform doc:name="DW Map Request Payload" doc:id="7476e6ee-77d7-49e8-b939-789529a094fe" >
+					<ee:message >
+						<ee:set-payload resource="dwl/p-get-accounts-no-params-request.dwl" />
+					</ee:message>
+					<ee:variables />
+				</ee:transform>
+			</when>
+			<when expression="#[(vars.queryParams.accountName == null) and (vars.queryParams.fromDate != null or vars.queryParams.toDate !=null)]">
+				<ee:transform doc:name="DW Map Request Payload" doc:id="944eb5f5-67fc-40e7-9f34-1e350d0ee75b">
+			<ee:message>
+						<ee:set-payload resource="dwl/p-get-accounts-by-date-request.dwl" />
+			</ee:message>
+			<ee:variables>
+			</ee:variables>
+		</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="DW Map Request Payload" doc:id="dea8972c-0d4b-4293-a17e-aa5e81faddb3" >
+					<ee:message >
+						<ee:set-payload resource="dwl/p-get-accounts-by-name-request.dwl" />
+					</ee:message>
+					<ee:variables />
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<flow-ref doc:name="cf-query-sfdc" doc:id="1491196e-bb8b-43c2-919d-6831ad15eb04" name="cf-query-sfdc" />
+	</sub-flow>
+</mule>

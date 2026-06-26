@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<secure-properties:config name="secureEnvPropertiesConfig" doc:name="Secure Properties Config" doc:id="83b45623-2dac-4a14-9ea7-cb71412bcd9a" file="properties\config-secure-${env}.yaml" key="${encrypt.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<tls:context name="apiTLSContext" doc:name="TLS Context" doc:id="59673971-cb05-4af2-a16d-619ba6e759fa" >
+		<tls:trust-store insecure="true" />
+		<tls:key-store type="${tls.keystore.type}" path="${tls.keystore.path}" alias="${tls.keystore.alias}" keyPassword="${secure::tls.keystore.keyPassword}" password="${secure::tls.keystore.password}" />
+	</tls:context>
+	<salesforce:sfdc-config name="salesforceConfig" doc:name="Salesforce Config" doc:id="e7e99a78-826c-4791-b152-641b322cbf14" >
+		<salesforce:basic-connection username="${secure::sfdc.username}" password="${secure::sfdc.password}" securityToken="${secure::sfdc.token}" >
+			<reconnection >
+				<reconnect frequency="${sfdc.reconnect.frequency}" count="${sfdc.reconnect.attempts}" />
+			</reconnection>
+		</salesforce:basic-connection>
+	</salesforce:sfdc-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="50a2542f-a563-4300-957d-cfd176530edd" >
+		<salesforce:basic-connection username="avatansh.sharma@curious-shark-ww4v7e.com" password="#Avatansh09" securityToken="fDcVWVOKGjv1tfDvnFizHNTS" >
+			<reconnection >
+				<reconnect />
+			</reconnection>
+		</salesforce:basic-connection>
+	</salesforce:sfdc-config>
+</mule>

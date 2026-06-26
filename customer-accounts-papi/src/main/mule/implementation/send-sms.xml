@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-process-sms" doc:id="a2fa9dfc-8803-450b-bf2f-2f6af1e90476" >
+		<set-variable value="#[payload]" doc:name="PV SET Account Payload" doc:id="c9f27ade-da6f-4805-97e1-70fef4c41e03" variableName="acctReq"/>
+		<ee:transform doc:name="PV SET method, path and Map SMS Request" doc:id="b401c601-b934-4204-91e2-efe4fd158477">
+			<ee:message>
+				<ee:set-payload resource="dwl/p-send-sms-request.dwl" />
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[p('sapi.sms.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[p('method.create')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-twilio-sapi" doc:id="ee9876eb-81e8-42af-84ef-d3a8c881025d" name="cf-request-twilio-sapi" />
+	</sub-flow>
+</mule>

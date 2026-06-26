@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <flow name="mf-impl-get-accounts" doc:id="d2c2212b-2f73-49c5-99ea-b8c1d97f03f9" >
+		<logger level="DEBUG" doc:name="LOG DEBUG Request Received" doc:id="2d4e4162-1de3-4833-b1c7-81a952ed2eb9" message="#[payload]" />
+		<flow-ref doc:name="sf-get-accounts" doc:id="aff4b997-1b3e-433e-9e51-1c8db0b69012" name="sf-get-accounts"/>
+		<ee:transform doc:name="DW Map Success Response">
+            <ee:message>
+				<ee:set-payload resource="dwl/p-get-accounts-response.dwl" />
+            </ee:message>
+        </ee:transform>
+		<logger level="DEBUG" doc:name="LOG DEBUG Response Sent" doc:id="c331c2aa-69d3-461a-90d3-e30536625c45" message="#[payload]" />
+	</flow>
+	<flow name="mf-impl-post-account" doc:id="86bfd96a-5f06-4635-933f-c60fb70248e1" >
+		<logger level="DEBUG" doc:name="LOG DEBUG Request Received" doc:id="ae24fe1f-62f0-4fe5-8576-97ac724bd1fd" message="#[payload]" />
+		<flow-ref doc:name="sf-post-account" doc:id="f2bb19c8-7a15-41bb-ab9c-a2f0528723aa" name="sf-post-account"/>
+		<ee:transform doc:name="DW Map Success Response">
+            <ee:message>
+				<ee:set-payload resource="dwl/p-post-account-response.dwl" />
+            </ee:message>
+        </ee:transform>
+		<logger level="DEBUG" doc:name="LOG DEBUG Response Sent" doc:id="adddd806-7d60-4935-8e95-60fbfc3f33ef" message="#[payload]" />
+	</flow>
+	<flow name="mf-impl-patch-account" doc:id="2ee27788-3601-4893-8109-b47b02cfb6d0" >
+		<logger level="DEBUG" doc:name="LOG DEBUG Request Received" doc:id="00044a85-6679-4199-ba06-2f354c7ed0e2" message="#[payload]" />
+		<flow-ref doc:name="sf-patch-account" doc:id="b5f8b06b-1034-403b-810a-68a5d6c2b148" name="sf-patch-account" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Response Sent" doc:id="aa91bd6c-b670-4629-9a7f-c3cb270cd8a6" message="#[payload]" />
+	</flow>
+</mule>

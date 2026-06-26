@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="cf-query-sfdc" doc:id="10bfab11-6837-4724-a574-237b66213445" >
+		<set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="35680cab-1752-4f45-b2f3-26c990a652ba" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-sent" doc:id="d3992426-5147-4389-8830-a289a065f4eb" name="csf-logger-request-sent" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Before Invoking Process API" doc:id="31a72335-85f1-45ba-9c12-6386783dd454" message="#[payload]" />
+		<salesforce:query doc:name="Query Records" doc:id="bf97f8c4-a28f-4b3a-b12f-0abf4ff81fc7" config-ref="salesforceConfig" >
+			<salesforce:salesforce-query ><![CDATA[#[payload]]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="DW Convert to JSON" doc:id="44a8efbe-b798-491c-a7dc-b04f9dd54d84">
+			<ee:message>
+				<ee:set-payload resource="dwl/common/p-common-convert-to-json.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="LOG DEBUG After Invoking Process API" doc:id="46533406-b414-4825-ac3d-5c9b1617b51f" message="#[payload]" />
+		<flow-ref doc:name="csf-logger-success-response-received" doc:id="05cf2e06-3593-41cd-96ec-fabffcdea491" name="csf-logger-success-response-received" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="305be25b-24e5-4b82-b766-c48d3d1f2047" >
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="a4b09bd6-5da9-4834-8ed7-08936a4b7602" name="csf-logger-failure-response-received" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
