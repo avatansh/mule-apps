@@ -11,13 +11,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           java-version: '8'
           distribution: 'temurin'
+
+      - name: Create Maven settings.xml with Anypoint credentials
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml << 'EOF'
+          <settings>
+            <servers>
+              <server>
+                <id>anypoint-exchange-v3-student-deployment</id>
+                <username>~~~Client~~~</username>
+                <password>${env.ANYPOINT_CLIENT_ID}~?~${env.ANYPOINT_CLIENT_SECRET}</password>
+              </server>
+              <server>
+                <id>anypoint-exchange-v3</id>
+                <username>~~~Client~~~</username>
+                <password>${env.ANYPOINT_CLIENT_ID}~?~${env.ANYPOINT_CLIENT_SECRET}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+        env:
+          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+
       - name: Install BOM
         run: mvn install -f bom/pom.xml -N
+        env:
+          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+
       - name: Install parent POM
         run: mvn install -f parent-pom/pom.xml -N
+        env:
+          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+
+      - name: Install apps-commons
+        run: mvn install -f apps-commons/pom.xml
+        env:
+          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+
       - name: Run MUnit - customer-web-eapi
         run: mvn test -f customer-web-eapi/pom.xml
+        env:
+          ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
+          ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
