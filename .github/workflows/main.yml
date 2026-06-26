@@ -41,11 +41,18 @@ jobs:
           pathlib.Path.home().joinpath('.m2/settings.xml').write_text(xml)
           print('Written. ID starts: ' + cid[:6])
           "
+      - name: Verify credentials and settings
+        run: |
+          echo "Client ID length: ${#ANYPOINT_CLIENT_ID}"
+          echo "Client Secret length: ${#ANYPOINT_CLIENT_SECRET}"
+          echo "Client ID first 6: ${ANYPOINT_CLIENT_ID:0:6}"
+          echo "=== settings.xml content ==="
+          sed 's/<password>[^<]*<\/password>/<password>MASKED<\/password>/g' ~/.m2/settings.xml
       - name: Install BOM
-        run: mvn install -f bom/pom.xml -N
+        run: mvn -s ~/.m2/settings.xml install -f bom/pom.xml -N
       - name: Install parent POM
-        run: mvn install -f parent-pom/pom.xml -N
+        run: mvn -s ~/.m2/settings.xml install -f parent-pom/pom.xml -N
       - name: Install apps-commons
-        run: mvn install -f apps-commons/pom.xml
+        run: mvn -s ~/.m2/settings.xml install -f apps-commons/pom.xml
       - name: Run MUnit
-        run: mvn test -f customer-web-eapi/pom.xml
+        run: mvn -s ~/.m2/settings.xml test -f customer-web-eapi/pom.xml
