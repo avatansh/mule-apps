@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<tls:context name="apiTLSContext" doc:name="TLS Context" doc:id="59673971-cb05-4af2-a16d-619ba6e759fa" >
+		<tls:trust-store insecure="true" />
+		<tls:key-store type="${tls.keystore.type}" path="${tls.keystore.path}" alias="${tls.keystore.alias}" keyPassword="${secure::tls.keystore.keyPassword}" password="${secure::tls.keystore.password}" />
+	</tls:context>
+	<secure-properties:config name="secureEnvPropertiesConfig" doc:name="Secure Properties Config" doc:id="ebcc179e-6ce1-43a0-be08-b723d679f28d" file="properties\config-secure-${env}.yaml" key="${encrypt.key}" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+</mule>

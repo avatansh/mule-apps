@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
+		<artifactId>solutions-parent-pom</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../parent-pom/pom.xml</relativePath>
+	</parent>
+	<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
+	<artifactId>customer-web-eapi-app</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>mule-application</packaging>
+	<name>customer-web-eapi</name>
+
+	<properties>
+		<api.groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</api.groupId>
+		<api.artifactId>customer-web-eapi</api.artifactId>
+		<api.version>1.0.3</api.version>
+		<api.layer>${api.layer.eapi}</api.layer>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mule.tools.maven</groupId>
+				<artifactId>mule-maven-plugin</artifactId>
+				<configuration>
+					<classifier>mule-application</classifier>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.mule.connectors</groupId>
+			<artifactId>mule-http-connector</artifactId>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.mule.modules</groupId>
+			<artifactId>mule-apikit-module</artifactId>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.modules</groupId>
+			<artifactId>mule-secure-configuration-property-module</artifactId>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>${student.deployment.ap.orgid}</groupId>
+			<artifactId>apps-commons</artifactId>
+			<classifier>mule-plugin</classifier>
+		</dependency>
+		<dependency>
+			<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
+			<artifactId>customer-web-eapi</artifactId>
+			<version>1.0.3</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
+		</dependency>
+	</dependencies>
+</project>

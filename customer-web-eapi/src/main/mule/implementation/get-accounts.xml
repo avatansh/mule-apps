@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-get-accounts" doc:id="ff0c1637-0bda-46e4-8f6c-eec68430c7c0" >
+		<choice doc:name="Check for Query Params" doc:id="5e477539-5bfc-43bc-a287-2768e9488ad5" >
+			<when expression="#[(attributes.queryParams.accountName == null) and (attributes.queryParams.fromDate == null) and (attributes.queryParams.toDate == null)]">
+				<logger level="INFO" doc:name="LOG INFO No Query Params Present" doc:id="516e9acf-d95f-4166-bc07-c8405bfc0419" message='#["No Query Params Present"]'/>
+				<ee:transform doc:name="FV SET method, path" doc:id="3491e6bb-daaa-44d7-83df-e3d3a18f1430" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="path" ><![CDATA[p('papi.accounts.path')]]></ee:set-variable>
+						<ee:set-variable variableName="method" ><![CDATA[p('method.retrieve')]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="FV SET method, path and queryParams" doc:id="bea97b3c-27d2-4482-82f0-47833c8814a8" >
+					<ee:message />
+					<ee:variables >
+						<ee:set-variable variableName="path" ><![CDATA[p('papi.accounts.path')]]></ee:set-variable>
+						<ee:set-variable variableName="method" ><![CDATA[p('method.retrieve')]]></ee:set-variable>
+						<ee:set-variable resource="dwl/common/v-common-get-query-params.dwl" variableName="queryParams" />
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+		<flow-ref doc:name="cf-request-account-process-api" doc:id="e5ad4f5d-b4e1-46f9-8bd0-4e879a286782" name="cf-request-account-process-api"/>
+	</sub-flow>
+</mule>

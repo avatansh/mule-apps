@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="csf-set-global-attributes" doc:id="f54e1d9a-85ad-44d2-a01b-ff6a2594f6fd" >
+		<ee:transform doc:name="PVs SET globalTranId, externalTranId, muleTranId" doc:id="257eb67a-f2b7-49cf-be26-1d471ce6e6cb">
+					<ee:message />
+					<ee:variables>
+				<ee:set-variable resource="dwl/common/v-common-externalTranId.dwl" variableName="externalTranId" />
+				<ee:set-variable resource="dwl/common/v-common-muleTranId.dwl" variableName="muleTranId" />
+				<ee:set-variable resource="dwl/common/v-common-globalTranId.dwl" variableName="globalTranId" />
+					</ee:variables>
+				</ee:transform>
+	</sub-flow>
+	<flow name="cf-request-account-process-api" doc:id="6ec3ddab-28f5-46c4-bfef-33400d5ee639" >
+		<set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="f6370373-f8ff-478f-a43a-f5d033643ebb" variableName="flowName" />
+		<flow-ref doc:name="csf-logger-request-sent" doc:id="2cd7cda3-f601-4104-bffa-b0314753549f" name="csf-logger-request-sent" />
+		<logger level="DEBUG" doc:name="LOG DEBUG Before Invoking Process API" doc:id="7828825f-62f4-4948-abe1-7de9bed2b749" message="#[payload]" />
+		<choice doc:name="Check for Query Params" doc:id="5abe17d0-2252-4e0d-b83e-f123181a8c91" >
+			<when expression="#[vars.queryParams != null]" >
+				<http:request method="#[vars.method]" doc:name="Request Account PAPI" doc:id="d449bbae-049b-45d0-b3f5-cd86a02e5478" config-ref="accountPapiHttpsRequestConfig" path="#[vars.path]" sendCorrelationId="AUTO" >
+					<http:query-params ><![CDATA[#[output application/java
+---
+vars.queryParams]]]></http:query-params>
+				</http:request>
+			</when>
+			<otherwise >
+				<http:request method="#[vars.method]" doc:name="Request Account PAPI" doc:id="700a29b1-2b7e-4786-a0f5-1083398cb4e1" config-ref="accountPapiHttpsRequestConfig" path="#[vars.path]" sendCorrelationId="AUTO" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="LOG DEBUG After Invoking Process API" doc:id="09c91cf8-49c7-4fe0-a075-ed0b08ef720f" message="#[payload]" />
+		<flow-ref doc:name="csf-logger-success-response-received" doc:id="da0075b5-5558-404e-b5f6-ebac1db3e654" name="csf-logger-success-response-received" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6a55810f-d4ec-4f0f-87d7-ce9e1a79077d" >
+				<flow-ref doc:name="csf-logger-failure-response-received" doc:id="c9b50291-8c21-47c0-9afa-9cf7fa8444df" name="csf-logger-failure-response-received" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

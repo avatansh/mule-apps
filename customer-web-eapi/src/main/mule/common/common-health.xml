@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<import file="health-common.xml"/>
+	<sub-flow name="check-all-dependencies-are-alive" doc:id="1c88c305-6170-42c9-9287-df040e461fad" >
+		<ee:transform doc:name="FV SET Method and Path" doc:id="332e3adb-5244-442f-b671-b4ff232df83b" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="path" ><![CDATA[p('common.health.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method" ><![CDATA[p('method.retrieve')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-account-process-api" doc:id="312c1e87-ed59-4568-90e8-81f85c52c448" name="cf-request-account-process-api"/>
+		<ee:transform doc:name="DW Map Health Check Response" doc:id="e42699dd-499c-4a33-959d-f5e9d6253da7" >
+			<ee:message >
+				<ee:set-payload resource="dwl/health/p-health-check-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sf-check-ping-status" doc:id="efca663c-c01b-402c-9382-317a3468ddee" >
+		<ee:transform doc:name="FV SET Method and Path" doc:id="4fa110df-cdc8-4f51-9202-e6cd739a014a">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[p('common.ping.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[p('method.retrieve')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-account-process-api" doc:id="4359dd20-345a-446f-ae36-0704b2d27a45" name="cf-request-account-process-api" />
+		<ee:transform doc:name="DW Map Ping Response" doc:id="fc8ffc69-ce07-4f28-b075-861110efa3ff" >
+			<ee:message >
+				<ee:set-payload resource="dwl/health/p-ping-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

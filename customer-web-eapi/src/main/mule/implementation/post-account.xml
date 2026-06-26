@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-post-accounts" doc:id="4c366030-b479-4f15-b651-143d8d468af1" >
+		<ee:transform doc:name="FV SET method, path and Map Payload" doc:id="995039a3-69fb-45dc-9d57-9437994a83ed">
+			<ee:message >
+				<ee:set-payload resource="dwl/p-post-account-request.dwl" />
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[p('papi.accounts.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[p('method.create')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-account-process-api" doc:id="3784a035-493e-4ad7-a709-c235e989ff46" name="cf-request-account-process-api"/>
+	</sub-flow>
+</mule>

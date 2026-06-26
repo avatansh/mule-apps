@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="mf-impl-get-accounts" doc:id="299ec954-1ed2-45b3-aaf5-4ca34c712275">
+		<logger level="DEBUG" doc:name="LOG DEBUG Request Received" doc:id="81cd2342-855f-4ff5-90bd-f819337a66ac" message="#[payload]" />
+		<flow-ref doc:name="sf-get-accounts" doc:id="b8da8e85-161c-4ac6-bef8-04f7f2002df5" name="sf-get-accounts"/>
+		<ee:transform doc:name="DW Map Response Payload" doc:id="38d91210-7f77-4f33-9f64-31d387f18459">
+			<ee:message>
+				<ee:set-payload resource="dwl/p-get-accounts-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="LOG DEBUG Response Sent" doc:id="23c3cd52-6111-45d9-ad3c-1d578de0c662" message="#[payload]" />
+	</flow>
+	<flow name="mf-impl-post-account" doc:id="7f7c2171-f876-432b-94b0-5f81fd769bd8">
+		<logger level="DEBUG" doc:name="LOG DEBUG Request Received" doc:id="955e1fee-5cb0-454b-8176-6aaa12af2a2f" message="#[payload]" />
+		<flow-ref doc:name="sf-post-accounts" doc:id="234819d0-89ce-4c7f-afbf-710ae11e776f" name="sf-post-accounts"/>
+		<ee:transform doc:name="DW Map Response Payload" doc:id="a7f48c1c-7cd2-441c-b04a-34b04b2bb14a">
+			<ee:message>
+				<ee:set-payload resource="dwl/p-post-account-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="DEBUG" doc:name="LOG DEBUG Response Sent" doc:id="89c320c3-31bd-465e-9b0d-067d72d8bc37" message="#[payload]" />
+	</flow>
+	<flow name="mf-impl-patch-account" doc:id="8abca721-3a3e-4afe-80cb-ddd06861dfb5" >
+		<logger level="DEBUG" doc:name="LOG DEBUG Request Received" doc:id="7a5d477b-f652-44c7-9d0e-6cb0c8c76b03" message="#[payload]" />
+		<flow-ref doc:name="sf-patch-account" doc:id="5e309420-ac34-447a-92c4-5b30e75f2eb4" name="sf-patch-account"/>
+		<logger level="DEBUG" doc:name="LOG DEBUG Response Sent" doc:id="12524cae-0117-4929-a7e2-559f0c13d814" message="#[payload]" />
+	</flow>
+</mule>

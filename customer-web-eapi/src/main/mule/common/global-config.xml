@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<http:listener-config name="apiHttpListenerConfig">
+        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS" readTimeout="${https.read.timeout}" connectionIdleTimeout="${https.idle.timeout}" tlsContext="apiTLSContext" />
+    </http:listener-config>
+    <apikit:config name="customer-web-eapi-config" api="resource::2e14f8c6-4d60-481b-bfb6-798695efc8f4:customer-web-eapi:1.0.3:raml:zip:customer-web-eapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<configuration-properties doc:name="envConfigurationProperties" doc:id="3647a966-b00f-4878-921c-e3fe0ebf85ac" file="properties\config-${env}.yaml" />
+	<configuration-properties doc:name="configurationProperties" doc:id="ad2d2b46-449a-49b4-8e23-9960d3c1f834" file="properties\config.yaml" />
+	<api-gateway:autodiscovery apiId="${api.id}" ignoreBasePath="true" doc:name="apiAutodiscovery" doc:id="e777e6b3-c274-4f5d-985c-b073405b18b8" flowRef="customer-web-eapi-main" />
+	<http:request-config name="accountPapiHttpsRequestConfig" doc:name="HTTP Request configuration" doc:id="7f139ec4-b085-42c1-9e1d-a6cfce60b7cd" responseTimeout="${request.config.papi.account.response.timeout}">
+			<http:request-connection protocol="HTTPS" tlsContext="apiTLSContext" host="${request.config.papi.account.host}" port="${request.config.papi.account.port}" connectionIdleTimeout="${request.config.papi.account.idle.timeout}">
+			<reconnection >
+				<reconnect frequency="${request.config.papi.account.retry.frequency}" count="${request.config.papi.account.retry.attempts}"/>
+			</reconnection>
+		</http:request-connection>
+		<http:default-headers >
+			<http:default-header key="client_id" value='#[attributes.headers."client_id"]' />
+			<http:default-header key="client_secret" value='#[attributes.headers."client_secret"]' />
+			<http:default-header key="globalTranId" value="#[vars.globalTranId]" />
+			<http:default-header key="externalTranId" value="#[vars.externalTranId]" />
+		</http:default-headers>
+	</http:request-config>
+</mule>

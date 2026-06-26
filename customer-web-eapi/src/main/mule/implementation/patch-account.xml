@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sf-patch-account" doc:id="a850d0a1-77b1-4fc7-80bf-5aa44ca4f129" >
+		<ee:transform doc:name="FV SET method, path and Map Payload" doc:id="341fc3b0-a658-4c60-855c-b2b9a511e242">
+			<ee:message>
+				<ee:set-payload resource="dwl/p-patch-account-request.dwl" />
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="path"><![CDATA[p('papi.accounts.path')]]></ee:set-variable>
+				<ee:set-variable variableName="method"><![CDATA[p('method.update')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="cf-request-account-process-api" doc:id="54ab6a6d-ee45-4607-b305-3886ea3dc548" name="cf-request-account-process-api" />
+	</sub-flow>
+</mule>

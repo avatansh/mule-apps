@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="customer-web-eapi-main">
+        <http:listener config-ref="apiHttpListenerConfig" path="/api/${api.majorVersion}/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="7b55f157-300e-4b12-be1f-de9588ee1099" variableName="flowName" />
+        <flow-ref doc:name="csf-set-global-attributes" doc:id="343967ba-b304-4ae1-bd45-fd333224b5b5" name="csf-set-global-attributes" />
+        <flow-ref doc:name="csf-logger-request-received" doc:id="8ae55cd7-1f0f-40e7-81c5-823ba700f9f6" name="csf-logger-request-received" />
+        <apikit:router config-ref="customer-web-eapi-config" />
+        <set-variable value="#[flow.name]" doc:name="PV SET flowName" doc:id="286ff1f8-25a2-4184-bbab-f22fe2a00497" variableName="flowName" />
+        <flow-ref doc:name="csf-logger-success-response-sent" doc:id="1e7961c6-b722-47e6-93f6-553e77c1fb8d" name="csf-logger-success-response-sent" />
+        <error-handler ref="api-error-handler" />
+    </flow>
+    <flow name="get:\ping:customer-web-eapi-config">
+        <flow-ref doc:name="sf-check-ping-status" doc:id="b299f9f9-54d6-4e1f-bb3f-acd4ae32df69" name="sf-check-ping-status" />
+    </flow>
+    <flow name="get:\accounts:customer-web-eapi-config">
+        <flow-ref doc:name="mf-impl-get-accounts" doc:id="59afb6b3-44f5-4846-8f04-b41b064d930b" name="mf-impl-get-accounts" />
+    </flow>
+    <flow name="post:\accounts:application\json:customer-web-eapi-config">
+        <flow-ref doc:name="mf-impl-post-account" doc:id="b3792802-3a15-40cb-abb1-fffd01553270" name="mf-impl-post-account" />
+    </flow>
+    <flow name="patch:\accounts:application\json:customer-web-eapi-config">
+        <flow-ref doc:name="mf-impl-patch-account" doc:id="b1b1c29e-52fa-414f-9fc9-e46fe841853f" name="mf-impl-patch-account" />
+    </flow>
+</mule>

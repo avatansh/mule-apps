@@ -1,0 +1,31 @@
+api:
+  id: ""
+
+tls.keystore:
+  type:        "pkcs12"
+  path:        "certs/customer-web-eapi.p12"
+  alias:       "server"
+
+request:
+  config:
+    papi:
+      contact:
+        host: ""
+        port: ""
+        response:
+          timeout: "70000"
+        idle:
+          timeout: "60000"
+        retry:
+          frequency: "2000"
+          attempts: "2"
+      account:
+        host: ""
+        port: ""
+        response:
+          timeout: "70000"
+        idle:
+          timeout: "60000"
+        retry:
+          frequency: "2000"
+          attempts: "2"
