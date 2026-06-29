@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="customer-web-eapi-impl-test-suite.xml"/>
+
+    <!-- ==================== mf-impl-get-accounts tests ==================== -->
+
+    <munit:test name="mf-impl-get-accounts-no-queryparams-success"
+                description="Verify mf-impl-get-accounts retrieves all accounts when no query params are provided"
+                doc:name="Get Accounts No Query Params Success Test"
+                doc:description="Mocks sf-get-accounts and asserts the DWL pass-through response is correctly returned">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Initial Empty Payload"
+                             doc:description="Provides an empty array payload to simulate a GET request with no body">
+                <munit:payload value="#[[]]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref"
+                                   doc:name="Mock sf-get-accounts Sub-Flow"
+                                   doc:description="Returns a fixed list of two accounts without making actual HTTP calls">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-get-accounts"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return doc:name="Return Two Mock Accounts"
+                                         doc:description="Supplies a two-element account list as the mock response">
+                    <munit-tools:payload value="#[[
+                        {id: &quot;001XX000003NGS1YAO&quot;, name: &quot;Acme Corp&quot;, accountNumber: &quot;ACC001&quot;},
+                        {id: &quot;001XX000003NGS2YAO&quot;, name: &quot;Globex Inc&quot;, accountNumber: &quot;ACC002&quot;}
+                    ]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="mf-impl-get-accounts"
+                      doc:name="Invoke mf-impl-get-accounts"
+                      doc:description="Calls the implementation flow under test"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"
+                                     doc:description="Checks the returned payload is not null"/>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]"
+                                     is="#[MunitTools::greaterThan(0)]"
+                                     doc:name="Assert Payload Has Records"
+                                     doc:description="Ensures at least one account was returned"/>
+            <munit-tools:assert-that expression="#[payload[0].name]"
+                                     is="#[MunitTools::equalTo('Acme Corp')]"
+                                     doc:name="Assert First Account Name"
+                                     doc:description="Validates the first account name is Acme Corp"/>
+            <munit-tools:assert-that expression="#[payload[1].name]"
+                                     is="#[MunitTools::equalTo('Globex Inc')]"
+                                     doc:name="Assert Second Account Name"
+                                     doc:description="Validates the second account name is Globex Inc"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="mf-impl-get-accounts-success-with-query-params"
+                description="Verify mf-impl-get-accounts returns filtered accounts when accountName, fromDate and toDate query params are provided"
+                doc:name="Get Accounts With Query Params"
+                doc:description="Mocks sf-get-accounts and asserts that the filtered account list is returned">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Test Event With Query Params"
+                             doc:description="Simulates a GET request with accountName, fromDate and toDate query parameters">
+                <munit:payload value="#[{}]"/>
+                <munit:attributes value="#[{queryParams: {accountName: &quot;Acme&quot;, fromDate: &quot;2024-01-01&quot;, toDate: &quot;2024-12-31&quot;}}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref"
+                                   doc:name="Mock sf-get-accounts With Query Params"
+                                   doc:description="Returns a filtered two-account list matching the accountName Acme">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-get-accounts"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return doc:name="Return Filtered Acme Accounts"
+                                         doc:description="Supplies two Acme accounts as the mock response">
+                    <munit-tools:payload value="#[[
+                        {id: &quot;0011A00001ACME1&quot;, name: &quot;Acme Corp&quot;, status: &quot;Active&quot;},
+                        {id: &quot;0011A00001ACME2&quot;, name: &quot;Acme Holdings&quot;, status: &quot;Active&quot;}
+                    ]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="mf-impl-get-accounts"
+                      doc:name="Call mf-impl-get-accounts Flow"
+                      doc:description="Executes the implementation flow that retrieves filtered accounts"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"
+                                     doc:description="Verifies the payload is not null after flow execution"/>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]"
+                                     is="#[MunitTools::greaterThan(0)]"
+                                     doc:name="Assert Payload Not Empty"
+                                     doc:description="Ensures at least one filtered account was returned"/>
+            <munit-tools:assert-that expression="#[payload[0].name]"
+                                     is="#[MunitTools::equalTo('Acme Corp')]"
+                                     doc:name="Assert First Filtered Account Name"
+                                     doc:description="Checks first account name equals Acme Corp"/>
+            <munit-tools:assert-that expression="#[payload[1].name]"
+                                     is="#[MunitTools::equalTo('Acme Holdings')]"
+                                     doc:name="Assert Second Filtered Account Name"
+                                     doc:description="Checks second account name equals Acme Holdings"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== mf-impl-post-account tests ==================== -->
+
+    <munit:test name="mf-impl-post-account-successful-creation"
+                description="Verify that mf-impl-post-account creates an account and correctly maps status, id, message, transactionId and timeStamp from the DWL"
+                doc:name="Post Account Successful Creation Test"
+                doc:description="Mocks sf-post-accounts and asserts the p-post-account-response DWL maps all required fields">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Account Creation Request Payload"
+                             doc:description="Provides a minimal account request body with name and billing city">
+                <munit:payload value="#[{name: &quot;Acme Inc&quot;, billingCity: &quot;San Jose&quot;}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref"
+                                   doc:name="Mock sf-post-accounts Sub-Flow"
+                                   doc:description="Returns a successful account creation response from the downstream PAPI">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-post-accounts"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return doc:name="Return Mocked Creation Response"
+                                         doc:description="Supplies a successful creation payload with status, id, message, transactionId and timeStamp">
+                    <munit-tools:payload value="#[{
+                        status: &quot;SUCCESS&quot;,
+                        id: &quot;001xx000003DHP0AAO&quot;,
+                        message: &quot;Account created&quot;,
+                        transactionId: &quot;txn-12345&quot;,
+                        timeStamp: &quot;2026-06-26T10:15:30Z&quot;
+                    }]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="mf-impl-post-account"
+                      doc:name="Invoke mf-impl-post-account Flow"
+                      doc:description="Calls the post-account implementation flow under test"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"
+                                     doc:description="Asserts the returned payload is not null"/>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('SUCCESS')]"
+                                     doc:name="Assert Status Equals SUCCESS"
+                                     doc:description="Verifies the mapped status field equals SUCCESS"/>
+            <munit-tools:assert-that expression="#[payload.id]"
+                                     is="#[MunitTools::equalTo('001xx000003DHP0AAO')]"
+                                     doc:name="Assert Account Id Matches"
+                                     doc:description="Checks the returned account id matches the expected Salesforce Id"/>
+            <munit-tools:assert-that expression="#[payload.message]"
+                                     is="#[MunitTools::equalTo('Account created')]"
+                                     doc:name="Assert Message Matches"
+                                     doc:description="Validates the response message equals Account created"/>
+            <munit-tools:assert-that expression="#[payload.transactionId]"
+                                     is="#[MunitTools::equalTo('txn-12345')]"
+                                     doc:name="Assert Transaction Id Matches"
+                                     doc:description="Ensures the transactionId is correctly mapped in the response"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== mf-impl-patch-account tests ==================== -->
+
+    <munit:test name="mf-impl-patch-account-success-test"
+                description="Verify that mf-impl-patch-account updates an account and returns the confirmation payload from sf-patch-account"
+                doc:name="Patch Account Success Test"
+                doc:description="Mocks sf-patch-account and asserts the status and account id are returned correctly">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Patch Event Payload"
+                             doc:description="Sets the request payload with the accountId and updated name">
+                <munit:payload value="#[{accountId: &quot;001XX000003NGS0YAO&quot;, name: &quot;Acme Corp Updated&quot;}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref"
+                                   doc:name="Mock sf-patch-account Sub-Flow"
+                                   doc:description="Returns a successful update confirmation from the mocked downstream PAPI">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-patch-account"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return doc:name="Return Mocked Patch Response"
+                                         doc:description="Supplies a SUCCESS status with the patched account id">
+                    <munit-tools:payload value="#[{
+                        status: &quot;SUCCESS&quot;,
+                        id: &quot;001XX000003NGS0YAO&quot;,
+                        message: &quot;Account updated successfully&quot;
+                    }]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="mf-impl-patch-account"
+                      doc:name="Invoke mf-impl-patch-account Flow"
+                      doc:description="Calls the patch-account implementation flow under test"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"
+                                     doc:description="Asserts that the returned payload is not null"/>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('SUCCESS')]"
+                                     doc:name="Assert Status Is SUCCESS"
+                                     doc:description="Asserts the response status field equals SUCCESS"/>
+            <munit-tools:assert-that expression="#[payload.id]"
+                                     is="#[MunitTools::equalTo('001XX000003NGS0YAO')]"
+                                     doc:name="Assert Account Id Matches"
+                                     doc:description="Asserts the returned account id matches the expected value"/>
+            <munit-tools:assert-that expression="#[payload.message]"
+                                     is="#[MunitTools::equalTo('Account updated successfully')]"
+                                     doc:name="Assert Update Message Matches"
+                                     doc:description="Validates the update confirmation message is correct"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

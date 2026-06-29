@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd">
+
+    <!-- MUnit config required so this file is processed as part of the test deployment -->
+    <munit:config name="test-error-helper-flows.xml"/>
+
+    <!-- Test-only helper flows using APP: namespace (custom error types, always valid with raise-error) -->
+    <!-- The api-error-handler from apps-commons uses on-error-continue with specific type matching.
+         APP:NOT_FOUND etc. will fall through to the MULE:ANY catch-all handler (500 path).
+         To exercise specific branches, we rely on the fact that api-error-handler handles MULE:ANY. -->
+
+    <flow name="sf-test-raise-not-found" doc:name="Raise APP:NOT_FOUND">
+        <raise-error type="APP:NOT_FOUND" description="Resource not found" doc:name="Raise NOT_FOUND"/>
+    </flow>
+
+    <flow name="sf-test-raise-bad-request" doc:name="Raise APP:BAD_REQUEST">
+        <raise-error type="APP:BAD_REQUEST" description="Bad request" doc:name="Raise BAD_REQUEST"/>
+    </flow>
+
+    <flow name="sf-test-raise-method-not-allowed" doc:name="Raise APP:METHOD_NOT_ALLOWED">
+        <raise-error type="APP:METHOD_NOT_ALLOWED" description="Method not allowed" doc:name="Raise METHOD_NOT_ALLOWED"/>
+    </flow>
+
+    <flow name="sf-test-raise-unsupported-media-type" doc:name="Raise APP:UNSUPPORTED_MEDIA_TYPE">
+        <raise-error type="APP:UNSUPPORTED_MEDIA_TYPE" description="Unsupported media type" doc:name="Raise UNSUPPORTED_MEDIA_TYPE"/>
+    </flow>
+
+    <flow name="sf-test-raise-not-acceptable" doc:name="Raise APP:NOT_ACCEPTABLE">
+        <raise-error type="APP:NOT_ACCEPTABLE" description="Not acceptable" doc:name="Raise NOT_ACCEPTABLE"/>
+    </flow>
+
+    <flow name="sf-test-raise-unauthorized" doc:name="Raise APP:UNAUTHORIZED">
+        <raise-error type="APP:UNAUTHORIZED" description="Unauthorized" doc:name="Raise UNAUTHORIZED"/>
+    </flow>
+
+    <flow name="sf-test-raise-internal-server-error" doc:name="Raise APP:INTERNAL_SERVER_ERROR">
+        <raise-error type="APP:INTERNAL_SERVER_ERROR" description="Internal server error" doc:name="Raise INTERNAL_SERVER_ERROR"/>
+    </flow>
+
+    <flow name="sf-test-raise-connectivity-error" doc:name="Raise APP:CONNECTIVITY_ERROR">
+        <raise-error type="APP:CONNECTIVITY_ERROR" description="Connection refused" doc:name="Raise CONNECTIVITY_ERROR"/>
+    </flow>
+
+</mule>

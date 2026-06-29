@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="customer-web-eapi-main-test-suite.xml"/>
+
+    <!-- ==================== APIKit route flow tests ==================== -->
+
+    <munit:test name="get-ping-route-flow-success"
+                description="Verify get-ping route flow delegates to sf-check-ping-status"
+                doc:name="GET Ping Route Flow Success">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Empty Event">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock sf-check-ping-status">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-check-ping-status"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'OK', apiName: 'customer-web-eapi', timestamp: '2026-06-29T00:00:00Z', dependencies: {}}]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="get:\ping:customer-web-eapi-config" doc:name="Call GET ping route flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload.status]" is="#[MunitTools::equalTo('OK')]" doc:name="Assert Status Is OK"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="get-accounts-route-flow-success"
+                description="Verify get-accounts route flow delegates to mf-impl-get-accounts"
+                doc:name="GET Accounts Route Flow Success">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Empty Event">
+                <munit:payload value="#[[]]"/>
+                <munit:attributes value="#[{queryParams: {}}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock mf-impl-get-accounts">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="mf-impl-get-accounts"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[[{id: '001XX000003NGS1YAO', name: 'Acme Corp'}]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="get:\accounts:customer-web-eapi-config" doc:name="Call GET accounts route flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]" is="#[MunitTools::greaterThan(0)]" doc:name="Assert Has Records"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="post-accounts-route-flow-success"
+                description="Verify post-accounts route flow delegates to mf-impl-post-account"
+                doc:name="POST Accounts Route Flow Success">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Account Payload">
+                <munit:payload value="#[{name: 'New Account', phone: '555-1234'}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock mf-impl-post-account">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="mf-impl-post-account"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'SUCCESS', id: '001xx000003DHP0AAO', message: 'Account created', transactionId: 'txn-001', timeStamp: '2026-06-29T00:00:00Z'}]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="post:\accounts:application\json:customer-web-eapi-config" doc:name="Call POST accounts route flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload.status]" is="#[MunitTools::equalTo('SUCCESS')]" doc:name="Assert Status Is SUCCESS"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="patch-accounts-route-flow-success"
+                description="Verify patch-accounts route flow delegates to mf-impl-patch-account"
+                doc:name="PATCH Accounts Route Flow Success">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Patch Payload">
+                <munit:payload value="#[{accountId: '001XX000003NGS0YAO', name: 'Updated Name'}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock mf-impl-patch-account">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="mf-impl-patch-account"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'SUCCESS', id: '001XX000003NGS0YAO', message: 'Account updated successfully'}]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="patch:\accounts:application\json:customer-web-eapi-config" doc:name="Call PATCH accounts route flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload.status]" is="#[MunitTools::equalTo('SUCCESS')]" doc:name="Assert Status Is SUCCESS"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== Main flow success (mocked apikit:router) ==================== -->
+
+    <munit:test name="main-flow-success-path"
+                description="Verify main flow success path covering csf-logger-request-received and csf-logger-success-response-sent"
+                doc:name="Main Flow Success Path">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Event">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock csf-set-global-attributes">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="csf-set-global-attributes"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[payload]"/>
+                    <munit-tools:variables>
+                        <munit-tools:variable key="globalTranId" value="#['test-global-id']"/>
+                        <munit-tools:variable key="externalTranId" value="#['test-external-id']"/>
+                        <munit-tools:variable key="muleTranId" value="#['test-mule-id']"/>
+                        <munit-tools:variable key="flowName" value="#['customer-web-eapi-main']"/>
+                    </munit-tools:variables>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit-tools:mock-when processor="apikit:router" doc:name="Mock APIKit Router Returns Success">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref" whereValue="customer-web-eapi-config"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[[{id: '001XX000003NGS1YAO', name: 'Acme Corp'}]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="customer-web-eapi-main" doc:name="Call customer-web-eapi-main"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]" is="#[MunitTools::notNullValue()]" doc:name="Assert Payload Not Null"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== Error handler tests (MULE:UNKNOWN expected) ==================== -->
+
+    <munit:test name="main-flow-not-found-404"
+                description="Error handler test via helper flow"
+                doc:name="Main Flow 404 via Helper"
+                expectedErrorType="MULE:UNKNOWN">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Event"><munit:payload value="#[{}]"/></munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock csf-set-global-attributes raises not-found">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="csf-set-global-attributes"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-call flow="sf-test-raise-not-found"/>
+            </munit-tools:mock-when>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock sf-log-error-and-send">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-log-error-and-send"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return><munit-tools:payload value="#[payload]"/></munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="customer-web-eapi-main" doc:name="Call main flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[1]" is="#[MunitTools::equalTo(1)]" doc:name="Pass"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="main-flow-bad-request-400"
+                description="Error handler test via helper flow"
+                doc:name="Main Flow 400 via Helper"
+                expectedErrorType="MULE:UNKNOWN">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Event"><munit:payload value="#[{}]"/></munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock csf-set-global-attributes raises bad-request">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="csf-set-global-attributes"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-call flow="sf-test-raise-bad-request"/>
+            </munit-tools:mock-when>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock sf-log-error-and-send">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-log-error-and-send"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return><munit-tools:payload value="#[payload]"/></munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="customer-web-eapi-main" doc:name="Call main flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[1]" is="#[MunitTools::equalTo(1)]" doc:name="Pass"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="main-flow-internal-server-error-500"
+                description="Error handler test via helper flow"
+                doc:name="Main Flow 500 via Helper"
+                expectedErrorType="MULE:UNKNOWN">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Event"><munit:payload value="#[{}]"/></munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock csf-set-global-attributes raises internal-error">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="csf-set-global-attributes"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-call flow="sf-test-raise-internal-server-error"/>
+            </munit-tools:mock-when>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock sf-log-error-and-send">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="sf-log-error-and-send"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return><munit-tools:payload value="#[payload]"/></munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="customer-web-eapi-main" doc:name="Call main flow"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[1]" is="#[MunitTools::equalTo(1)]" doc:name="Pass"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

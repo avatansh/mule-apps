@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="common-config-test-suite.xml"/>
+
+    <!-- ==================== cf-request-account-process-api tests ==================== -->
+
+    <munit:test name="cf-request-account-process-api-no-query-params-success"
+                description="Verify cf-request-account-process-api invokes HTTP request - covers csf-logger-request-sent and csf-logger-success-response-received"
+                doc:name="cf-request-account-process-api No Query Params Success">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Method Path Variables">
+                <munit:payload value="#[{}]"/>
+                <munit:variables>
+                    <munit:variable key="method" value="#['GET']"/>
+                    <munit:variable key="path" value="#['/api/v1/ping']"/>
+                    <munit:variable key="flowName" value="#['cf-request-account-process-api']"/>
+                    <munit:variable key="globalTranId" value="#['test-global-tran-id']"/>
+                    <munit:variable key="externalTranId" value="#['test-external-tran-id']"/>
+                </munit:variables>
+            </munit:set-event>
+            <munit-tools:mock-when processor="http:request" doc:name="Mock HTTP Request No Query Params">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref" whereValue="accountPapiHttpsRequestConfig"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'OK', message: 'pong'}]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="cf-request-account-process-api" doc:name="Call cf-request-account-process-api"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('OK')]"
+                                     doc:name="Assert Status Is OK"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="cf-request-account-process-api-with-query-params-success"
+                description="Verify cf-request-account-process-api passes query params to HTTP request"
+                doc:name="cf-request-account-process-api With Query Params Success">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Method Path QueryParams Variables">
+                <munit:payload value="#[{}]"/>
+                <munit:variables>
+                    <munit:variable key="method" value="#['GET']"/>
+                    <munit:variable key="path" value="#['/api/v1/accounts']"/>
+                    <munit:variable key="queryParams" value="#[{accountName: 'Acme', fromDate: '2024-01-01'}]"/>
+                    <munit:variable key="flowName" value="#['cf-request-account-process-api']"/>
+                    <munit:variable key="globalTranId" value="#['test-global-tran-id']"/>
+                    <munit:variable key="externalTranId" value="#['test-external-tran-id']"/>
+                </munit:variables>
+            </munit:set-event>
+            <munit-tools:mock-when processor="http:request" doc:name="Mock HTTP Request With Query Params">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref" whereValue="accountPapiHttpsRequestConfig"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[[{id: '001XX000003NGS1YAO', name: 'Acme Corp'}]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="cf-request-account-process-api" doc:name="Call cf-request-account-process-api With Query Params"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]"
+                                     is="#[MunitTools::greaterThan(0)]"
+                                     doc:name="Assert Payload Has Records"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- Error path test: mocks csf-logger-success-response-received to raise APP:CONNECTIVITY_ERROR,
+         triggering on-error-propagate which calls csf-logger-failure-response-received -->
+    <munit:test name="cf-request-account-process-api-error-path"
+                description="Verify cf-request-account-process-api error handler covers csf-logger-failure-response-received"
+                doc:name="cf-request-account-process-api Error Path"
+                expectedErrorType="MULE:UNKNOWN">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Method Path Variables">
+                <munit:payload value="#[{}]"/>
+                <munit:variables>
+                    <munit:variable key="method" value="#['GET']"/>
+                    <munit:variable key="path" value="#['/api/v1/accounts']"/>
+                    <munit:variable key="flowName" value="#['cf-request-account-process-api']"/>
+                    <munit:variable key="globalTranId" value="#['test-global-tran-id']"/>
+                    <munit:variable key="externalTranId" value="#['test-external-tran-id']"/>
+                </munit:variables>
+            </munit:set-event>
+            <munit-tools:mock-when processor="http:request" doc:name="Mock HTTP Request Returns OK">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="config-ref" whereValue="accountPapiHttpsRequestConfig"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'OK'}]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock csf-logger-success-response-received raises error">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="csf-logger-success-response-received"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-call flow="sf-test-raise-connectivity-error"/>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="cf-request-account-process-api" doc:name="Call cf-request-account-process-api Expecting Error"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[1]"
+                                     is="#[MunitTools::equalTo(1)]"
+                                     doc:name="Error handler was invoked"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

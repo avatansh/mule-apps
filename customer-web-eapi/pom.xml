@@ -25,14 +25,77 @@
 			<plugin>
 				<groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
+				<extensions>true</extensions>
 				<configuration>
 					<classifier>mule-application</classifier>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.mulesoft.munit.tools</groupId>
+				<artifactId>munit-maven-plugin</artifactId>
+				<version>${munit.version}</version>
+				<executions>
+					<execution>
+						<id>test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>test</goal>
+							<goal>coverage-report</goal>
+						</goals>
+					</execution>
+				</executions>
+			<configuration>
+					<coverage>
+						<formats>
+							<format>html</format>
+							<format>console</format>
+						</formats>
+						<runCoverage>true</runCoverage>
+					</coverage>
+					<runtimeVersion>4.4.0-20230320</runtimeVersion>
+					<systemProperties>
+						<env>dev</env>
+					</systemProperties>
+					<argLines>
+						<argLine>-Denv=dev</argLine>
+						<argLine>-Dencrypt.key=secure12345</argLine>
+						<argLine>--add-opens=java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.io=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.net=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.security=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.security.cert=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.text=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.util=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/java.util.concurrent=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/javax.crypto=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/sun.security.pkcs=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/sun.security.provider=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.base/sun.security.x509=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.desktop/java.awt.font=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.desktop/java.beans=ALL-UNNAMED</argLine>
+						<argLine>--add-opens=java.xml/com.sun.org.apache.xerces.internal.impl=ALL-UNNAMED</argLine>
+					</argLines>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-runner</artifactId>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.munit</groupId>
+			<artifactId>munit-tools</artifactId>
+			<classifier>mule-plugin</classifier>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>

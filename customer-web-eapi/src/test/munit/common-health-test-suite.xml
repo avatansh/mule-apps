@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="common-health-test-suite.xml"/>
+
+    <!-- ==================== sf-check-ping-status tests ==================== -->
+
+    <munit:test name="sf-check-ping-status-successful-ping"
+                description="Verify that sf-check-ping-status calls the downstream PAPI and returns an OK ping response with status, apiName, apiVersion, timestamp and dependencies"
+                doc:name="sf-check-ping-status Successful Ping Test"
+                doc:description="Mocks cf-request-account-process-api and asserts the p-ping-response DWL constructs the expected response structure">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Empty Initial Event"
+                             doc:description="Initialises the test with an empty payload to simulate an inbound ping request">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref"
+                                   doc:name="Mock cf-request-account-process-api Flow"
+                                   doc:description="Intercepts the HTTP call to the downstream PAPI and returns a canned OK ping response">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="cf-request-account-process-api"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return doc:name="Return Mocked Ping PAPI Response"
+                                         doc:description="Supplies an OK status payload simulating a successful ping from the process API">
+                    <munit-tools:payload value="#[{
+                        status: &quot;OK&quot;,
+                        message: &quot;pong&quot;,
+                        timestamp: &quot;2026-06-29T00:00:00Z&quot;
+                    }]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="sf-check-ping-status"
+                      doc:name="Invoke sf-check-ping-status Sub-Flow"
+                      doc:description="Calls the sf-check-ping-status sub-flow under test"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"
+                                     doc:description="Asserts the ping response payload is not null after the DWL transformation"/>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('OK')]"
+                                     doc:name="Assert Status Is OK"
+                                     doc:description="Asserts that the p-ping-response DWL hardcoded status field is OK"/>
+            <munit-tools:assert-that expression="#[payload.timestamp]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Timestamp Not Null"
+                                     doc:description="Verifies the DWL-generated timestamp field is present in the response"/>
+            <munit-tools:assert-that expression="#[payload.dependencies]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Dependencies Not Null"
+                                     doc:description="Confirms the dependencies field (mapped from the upstream payload) is present"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>

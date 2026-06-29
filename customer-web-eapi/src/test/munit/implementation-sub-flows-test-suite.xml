@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+      xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+        http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+    <munit:config name="implementation-sub-flows-test-suite.xml"/>
+
+    <!-- ==================== sf-get-accounts tests ==================== -->
+
+    <munit:test name="sf-get-accounts-no-query-params"
+                description="Verify sf-get-accounts calls cf-request-account-process-api when no query params provided"
+                doc:name="sf-get-accounts No Query Params"
+                doc:description="All query params null - takes the when branch">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Null Query Params Event">
+                <munit:payload value="#[[]]"/>
+                <munit:attributes value="#[{queryParams: {accountName: null, fromDate: null, toDate: null}}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock cf-request-account-process-api">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="cf-request-account-process-api"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[[{id: '001XX000003NGS1YAO', name: 'Acme Corp'}]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="sf-get-accounts" doc:name="Call sf-get-accounts"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"/>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]"
+                                     is="#[MunitTools::greaterThan(0)]"
+                                     doc:name="Assert Payload Has Records"/>
+        </munit:validation>
+    </munit:test>
+
+    <munit:test name="sf-get-accounts-with-query-params"
+                description="Verify sf-get-accounts sets queryParams variable and calls cf-request-account-process-api when query params are provided"
+                doc:name="sf-get-accounts With Query Params"
+                doc:description="accountName provided - takes the otherwise branch">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Query Params Event">
+                <munit:payload value="#[{}]"/>
+                <munit:attributes value="#[{queryParams: {accountName: 'Acme', fromDate: '2024-01-01', toDate: '2024-12-31'}}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock cf-request-account-process-api">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="cf-request-account-process-api"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[[{id: '001XX000003NGS1YAO', name: 'Acme Corp'}]]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="sf-get-accounts" doc:name="Call sf-get-accounts"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"/>
+            <munit-tools:assert-that expression="#[sizeOf(payload)]"
+                                     is="#[MunitTools::greaterThan(0)]"
+                                     doc:name="Assert Payload Has Records"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== sf-post-accounts tests ==================== -->
+
+    <munit:test name="sf-post-accounts-success"
+                description="Verify sf-post-accounts transforms request payload and calls cf-request-account-process-api"
+                doc:name="sf-post-accounts Success"
+                doc:description="Provides account creation payload and mocks cf-request-account-process-api">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Account Creation Payload">
+                <munit:payload value="#[{
+                    id: null,
+                    name: 'Acme Inc',
+                    accountNumber: 'ACC001',
+                    phone: '555-1234',
+                    email: 'info@acme.com',
+                    contactPreference: 'EMAIL',
+                    mailingAddress: {street: '123 Main St', city: 'San Jose', state: 'CA', country: 'US', postalCode: '95101'},
+                    shippingAddress: {street: '123 Main St', city: 'San Jose', state: 'CA', country: 'US', postalCode: '95101'}
+                }]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock cf-request-account-process-api">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="cf-request-account-process-api"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'SUCCESS', id: '001xx000003DHP0AAO', message: 'Account created', transactionId: 'txn-001', timeStamp: '2026-01-01T00:00:00Z'}]" mediaType="application/java"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="sf-post-accounts" doc:name="Call sf-post-accounts"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"/>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('SUCCESS')]"
+                                     doc:name="Assert Status Is SUCCESS"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== sf-patch-account tests ==================== -->
+
+    <munit:test name="sf-patch-account-success"
+                description="Verify sf-patch-account transforms patch payload and calls cf-request-account-process-api"
+                doc:name="sf-patch-account Success"
+                doc:description="Provides account update payload and mocks cf-request-account-process-api">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Account Update Payload">
+                <munit:payload value="#[{accountId: '001XX000003NGS0YAO', name: 'Acme Corp Updated', phone: '555-9999'}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock cf-request-account-process-api">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="cf-request-account-process-api"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'SUCCESS', id: '001XX000003NGS0YAO', message: 'Account updated successfully'}]" mediaType="application/java"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="sf-patch-account" doc:name="Call sf-patch-account"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"/>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('SUCCESS')]"
+                                     doc:name="Assert Status Is SUCCESS"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== check-all-dependencies-are-alive tests ==================== -->
+
+    <munit:test name="check-all-dependencies-are-alive-success"
+                description="Verify check-all-dependencies-are-alive sets health path/method and transforms response"
+                doc:name="check-all-dependencies-are-alive Success"
+                doc:description="Mocks cf-request-account-process-api and asserts health response is mapped correctly">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Empty Event">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock cf-request-account-process-api">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="cf-request-account-process-api"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[{status: 'OK', apiName: 'customer-accounts-papi', apiVersion: '1.0.0'}]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="check-all-dependencies-are-alive" doc:name="Call check-all-dependencies-are-alive"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null"/>
+            <munit-tools:assert-that expression="#[payload.status]"
+                                     is="#[MunitTools::equalTo('OK')]"
+                                     doc:name="Assert Status Is OK"/>
+            <munit-tools:assert-that expression="#[payload.timestamp]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Timestamp Is Present"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== csf-set-global-attributes tests ==================== -->
+
+    <munit:test name="csf-set-global-attributes-sets-transaction-ids"
+                description="Verify csf-set-global-attributes sets globalTranId, externalTranId and muleTranId variables"
+                doc:name="csf-set-global-attributes Sets Transaction IDs"
+                doc:description="Calls the sub-flow and asserts all three transaction ID variables are set">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Initial Event">
+                <munit:payload value="#[{}]"/>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="csf-set-global-attributes" doc:name="Call csf-set-global-attributes"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[vars.globalTranId]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert globalTranId Is Set"/>
+            <munit-tools:assert-that expression="#[vars.muleTranId]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert muleTranId Is Set"/>
+        </munit:validation>
+    </munit:test>
+
+    <!-- ==================== sf-log-error-and-send tests ==================== -->
+
+    <munit:test name="sf-log-error-and-send-invokes-logger"
+                description="Verify sf-log-error-and-send calls csf-logger-failure-response-sent"
+                doc:name="sf-log-error-and-send Invokes Logger"
+                doc:description="Mocks csf-logger-failure-response-sent and asserts it is invoked">
+        <munit:behavior>
+            <munit:set-event doc:name="Set Error Event">
+                <munit:payload value="#[{message: 'An error occurred', errorCode: 'ERR-001'}]"/>
+            </munit:set-event>
+            <munit-tools:mock-when processor="flow-ref" doc:name="Mock csf-logger-failure-response-sent">
+                <munit-tools:with-attributes>
+                    <munit-tools:with-attribute attributeName="name" whereValue="csf-logger-failure-response-sent"/>
+                </munit-tools:with-attributes>
+                <munit-tools:then-return>
+                    <munit-tools:payload value="#[payload]"/>
+                </munit-tools:then-return>
+            </munit-tools:mock-when>
+        </munit:behavior>
+        <munit:execution>
+            <flow-ref name="sf-log-error-and-send" doc:name="Call sf-log-error-and-send"/>
+        </munit:execution>
+        <munit:validation>
+            <munit-tools:assert-that expression="#[payload]"
+                                     is="#[MunitTools::notNullValue()]"
+                                     doc:name="Assert Payload Not Null After Error Logging"/>
+        </munit:validation>
+    </munit:test>
+
+</mule>
