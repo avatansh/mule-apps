@@ -10,6 +10,11 @@ jobs:
     env:
       ANYPOINT_CLIENT_ID: ${{ secrets.ANYPOINT_CLIENT_ID }}
       ANYPOINT_CLIENT_SECRET: ${{ secrets.ANYPOINT_CLIENT_SECRET }}
+      # Enterprise (EE-entitled) Anypoint account creds — required for Mule 4.9.x MUnit,
+      # which pulls the embedded MULE_EE runtime (com.mulesoft.licm:licm, mule-core-ee)
+      # from the private enterprise repo. NOT the Connected App client id/secret.
+      ANYPOINT_USERNAME: ${{ secrets.ANYPOINT_USERNAME }}
+      ANYPOINT_PASSWORD: ${{ secrets.ANYPOINT_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -28,6 +33,8 @@ jobs:
           import os, pathlib
           cid = os.environ['ANYPOINT_CLIENT_ID']
           csec = os.environ['ANYPOINT_CLIENT_SECRET']
+          user = os.environ.get('ANYPOINT_USERNAME', '')
+          pwd = os.environ.get('ANYPOINT_PASSWORD', '')
           pw = cid + '~?~' + csec
           xml = '''<?xml version=\"1.0\"?>
           <settings>
@@ -36,6 +43,8 @@ jobs:
               <server><id>anypoint-exchange-v3</id><username>~~~Client~~~</username><password>''' + pw + '''</password></server>
               <server><id>releases-ee</id><username>~~~Client~~~</username><password>''' + pw + '''</password></server>
               <server><id>mulesoft-releases</id><username>~~~Client~~~</username><password>''' + pw + '''</password></server>
+              <server><id>mulesoft-private</id><username>''' + user + '''</username><password>''' + pwd + '''</password></server>
+              <server><id>mule-ee-releases</id><username>''' + user + '''</username><password>''' + pwd + '''</password></server>
             </servers>
           </settings>'''
           pathlib.Path.home().joinpath('.m2/settings.xml').write_text(xml)
