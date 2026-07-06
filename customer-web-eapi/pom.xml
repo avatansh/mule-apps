@@ -52,7 +52,7 @@
 						</formats>
 						<runCoverage>true</runCoverage>
 					</coverage>
-					<runtimeVersion>4.4.0-20230320</runtimeVersion>
+					<runtimeVersion>4.9.18</runtimeVersion>
 					<systemProperties>
 						<env>dev</env>
 					</systemProperties>
