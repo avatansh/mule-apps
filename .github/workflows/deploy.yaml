@@ -1,80 +1,18 @@
-name: Deploy on merge + notify orchestrator
+# Thin caller — deploy on merge via the shared reusable workflow. The reusable
+# deploy-ch2.yml now also reports cd-result to the orchestrator, so no bespoke
+# notify job is needed here. Pin @main to a tag once mule-ci-cd is released.
+name: Deploy to CH2.0
 
-# Triggers on ANY pull request merge, into ANY base branch (not just main).
-# GitHub fires `pull_request: closed` for every PR close; we only act when it
-# was actually merged (see the `if:` guards on the jobs below).
 on:
   pull_request:
     types: [closed]
 
 jobs:
-  # ── Job 1: deploy the merged app to CloudHub 2.0 ────────────────────────────
-  # Uses the shared reusable workflow. If this repo builds/deploys differently,
-  # replace this job's body with your own steps — but keep the job id `deploy`
-  # so `notify-orchestrator` (needs: deploy) keeps working.
   deploy:
     if: ${{ github.event.pull_request.merged == true }}
     uses: avatansh/mule-ci-cd/.github/workflows/deploy-ch2.yml@main
     with:
-      environment: dev                 # Anypoint environment name (NOT "Sandbox")
-      target: Cloudhub-US-East-2
-      replicas: "1"
-      vcores: "0.1"
+      environment: dev
+      module-path: customer-web-eapi
       extra-maven-args: "-Dch2.runtimeEnv=dev"
-    secrets: inherit                   # ANYPOINT_CLIENT_ID/SECRET, ENCRYPT_KEY, etc.
-
-  # ── Job 2 (Step 2): report the deploy outcome back to the orchestrator ───────
-  # Runs on success AND failure so a failed deploy triggers the rollback path.
-  notify-orchestrator:
-    needs: deploy
-    if: ${{ always() && github.event.pull_request.merged == true }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}   # the branch that received the merge
-          fetch-depth: 50                                   # history to find the upgrade commit
-
-      - name: Notify orchestrator (cd-result)
-        env:
-          ORCH_BASE_URL: ${{ vars.ORCH_BASE_URL || 'https://platform-lifecycle-orchestrator-vpsht8.5sc6y6-4.usa-e2.cloudhub.io' }}
-          CD_WEBHOOK_SECRET: ${{ secrets.CD_WEBHOOK_SECRET }}   # plaintext == config-secure-dev.yaml github.webhookSecret
-          DEPLOY_RESULT: ${{ needs.deploy.result }}             # success | failure | cancelled | skipped
-          PR_BODY: ${{ github.event.pull_request.body }}        # orchestrator embeds "- Job: <jobId>" here
-        run: |
-          set -euo pipefail
-
-          # 1) Find the jobId — first from the PR body, then fall back to the commit message.
-          JOB_ID="$(printf '%s' "${PR_BODY:-}" \
-            | grep -oE 'Job: *[A-Za-z0-9._-]+' | head -n1 | sed -E 's/Job: *//')"
-          if [ -z "${JOB_ID}" ]; then
-            JOB_ID="$(git log -30 --pretty=%B \
-              | grep -oE 'Java 17 upgrade \(([^)]+)\)' | head -n1 \
-              | sed -E 's/.*\(([^)]+)\).*/\1/')"
-          fi
-
-          if [ -z "${JOB_ID}" ]; then
-            echo "No orchestrator jobId found in this PR — not an orchestrator upgrade. Skipping."
-            exit 0
-          fi
-
-          # 2) Map the deploy result to the contract's value.
-          if [ "${DEPLOY_RESULT}" = "success" ]; then
-            RESULT="success"
-            BODY="$(printf '{"jobId":"%s","result":"success"}' "${JOB_ID}")"
-          else
-            RESULT="failure"
-            BODY="$(printf '{"jobId":"%s","result":"failure","error":"CD %s (run %s)"}' \
-              "${JOB_ID}" "${DEPLOY_RESULT}" "${GITHUB_RUN_ID}")"
-          fi
-
-          # 3) Sign the EXACT body bytes (lowercase hex; matches DataWeave Crypto::HMACWith).
-          SIG="sha256=$(printf '%s' "${BODY}" \
-            | openssl dgst -sha256 -hmac "${CD_WEBHOOK_SECRET}" | sed 's/^.*= //')"
-
-          # 4) POST the verbatim body (--data-binary, TLS verification ON).
-          echo "Reporting cd-result: jobId=${JOB_ID} result=${RESULT}"
-          curl -sS -f -X POST "${ORCH_BASE_URL}/api/v1/webhook/cd-result" \
-            -H "Content-Type: application/json" \
-            -H "X-CD-Signature-256: ${SIG}" \
-            --data-binary "${BODY}"
+    secrets: inherit

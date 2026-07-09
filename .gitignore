@@ -1,0 +1,75 @@
+# ─────────────────────────────────────────────────────────────
+# Monorepo-wide ignores (applies to every module: bom, parent-pom,
+# apps-commons, customer-*-*). Patterns use **/ so they match at any depth.
+# ─────────────────────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────
+# Maven / build output
+# ─────────────────────────────────────────────────────────────
+**/target/
+*.class
+*.jar
+*.war
+*.ear
+dependency-reduced-pom.xml
+release.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ─────────────────────────────────────────────────────────────
+# Mule / Anypoint Studio tooling (machine-local, regenerated)
+# ─────────────────────────────────────────────────────────────
+**/.mule/
+**/.studio/
+.tooling-project
+*.munit-resources
+.mode
+mule_*.log
+velocity.log
+**/*.munit-resources
+
+# ─────────────────────────────────────────────────────────────
+# Local test / run artifacts (throwaway)
+# ─────────────────────────────────────────────────────────────
+**/target/site/munit/
+*.log
+surefire-reports/
+
+# ─────────────────────────────────────────────────────────────
+# IDEs / editors
+# ─────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.metadata
+.settings/
+.classpath
+.project
+.loadpath
+.buildpath
+.cproject
+.externalToolBuilders/
+*.launch
+*.pydevproject
+bin/**
+tmp/**
+local.properties
+*.swp
+*.bak
+*.tmp
+*~.nib
+*~
+
+# ─────────────────────────────────────────────────────────────
+# OS cruft
+# ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

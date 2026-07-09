@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Custom Maven settings for Mule Apps projects (Java 17 upgrade automation demo).
+  Uses Maven 3.8.6 at C:\Maven\apache-maven-3.8.6
+  Dedicated local repository: C:\Users\avatansh.sharma\.m2-mule-apps\repository
+  Use via:  mvn-mule.bat [goals]   OR   C:\Maven\apache-maven-3.8.6\bin\mvn.cmd -s mule-settings.xml [goals]
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
+
+  <!--
+    Dedicated local repo, separate from the default ~/.m2/repository.
+    Keeps Mule artefacts isolated for this demo/automation project.
+  -->
+  <localRepository>C:\Users\avatansh.sharma\.m2-mule-apps\repository</localRepository>
+
+  <servers>
+    <!-- MuleSoft EE repository (requires MuleSoft credentials) -->
+    <server>
+      <id>releases-ee</id>
+      <username>muletraining.nexus</username>
+      <password>eApHMgTm</password>
+    </server>
+
+    <!-- Anypoint Exchange v3 - Connected App credentials (Client ID / Client Secret) -->
+    <server>
+      <id>anypoint-exchange-v3-student-deployment</id>
+      <username>~~~Client~~~</username>
+      <password>ca139b3fe3d94d848540115c50da6be7~?~5d2261F9909544B5B4ef7f330C5b28ca</password>
+    </server>
+    <server>
+      <id>anypoint-exchange-v3</id>
+      <username>~~~Client~~~</username>
+      <password>ca139b3fe3d94d848540115c50da6be7~?~5d2261F9909544B5B4ef7f330C5b28ca</password>
+    </server>
+
+    <!-- Anypoint Exchange v3 - org-scoped (Connected App) -->
+    <server>
+      <id>anypoint-exchange-a63e6d25-8aaf-4512-b36d-d91b90a55c4a</id>
+      <username>~~~Client~~~</username>
+      <password>ca139b3fe3d94d848540115c50da6be7~?~5d2261F9909544B5B4ef7f330C5b28ca</password>
+    </server>
+
+    <!-- Anypoint Exchange v2 - Bearer token (legacy, kept for compatibility) -->
+    <server>
+      <id>anypoint-exchange-v2</id>
+      <username>~~~Token~~~</username>
+      <password>1a62c2f0-de90-4fdf-b810-09b28199c130</password>
+    </server>
+  </servers>
+
+  <profiles>
+    <profile>
+      <id>mule-dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <repositories>
+        <!--
+          Anypoint Exchange v3 (org-scoped) - must be FIRST so EMMP resolves correctly.
+          Resolves org artifacts: apps-commons, json-logger, customer-*-api RAML ZIPs, etc.
+        -->
+        <repository>
+          <id>anypoint-exchange-v3-student-deployment</id>
+          <name>Anypoint Exchange v3 (org)</name>
+          <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+
+        <!-- MuleSoft public releases (connectors, modules - no auth needed) -->
+        <repository>
+          <id>mulesoft-releases</id>
+          <name>MuleSoft Releases Repository</name>
+          <url>https://repository.mulesoft.org/releases/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+
+        <!-- MuleSoft EE repository (Mule runtime EE, SOAPKit, etc.) -->
+        <repository>
+          <id>releases-ee</id>
+          <name>Mule EE Release Repository</name>
+          <url>https://repository.mulesoft.org/nexus/content/repositories/releases-ee/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+
+        <!-- Anypoint Exchange v3 general (fallback) -->
+        <repository>
+          <id>anypoint-exchange-v3</id>
+          <name>Anypoint Exchange v3</name>
+          <url>https://maven.anypoint.mulesoft.com/api/v3/maven</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+
+      <pluginRepositories>
+        <!-- MuleSoft public plugin repository (mule-maven-plugin, munit-maven-plugin) -->
+        <pluginRepository>
+          <id>mulesoft-releases</id>
+          <name>MuleSoft Releases Repository</name>
+          <url>https://repository.mulesoft.org/releases/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+
+        <!-- MuleSoft EE plugin repository (MUnit runner needs EE runtime) -->
+        <pluginRepository>
+          <id>releases-ee</id>
+          <name>Mule EE Release Repository</name>
+          <url>https://repository.mulesoft.org/nexus/content/repositories/releases-ee/</url>
+          <releases>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+</settings>
