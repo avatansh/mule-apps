@@ -39,6 +39,9 @@ velocity.log
 **/target/site/munit/
 *.log
 surefire-reports/
+mule-settings.xml
+install-all.bat
+mvn-mule.bat
 
 # ─────────────────────────────────────────────────────────────
 # IDEs / editors
