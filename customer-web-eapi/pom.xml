@@ -18,13 +18,20 @@
 		<api.artifactId>customer-web-eapi</api.artifactId>
 		<api.version>1.0.3</api.version>
 		<api.layer>${api.layer.eapi}</api.layer>
-	</properties>
+	    <app.runtime>4.9.18</app.runtime>
+    <app.runtime.semver>4.9.18</app.runtime.semver>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <munit.version>3.6.3</munit.version>
+  </properties>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.mule.tools.maven</groupId>
 				<artifactId>mule-maven-plugin</artifactId>
+                <version>4.10.0</version>
 				<extensions>true</extensions>
 				<configuration>
 					<classifier>mule-application</classifier>
@@ -52,31 +59,31 @@
 						</formats>
 						<runCoverage>true</runCoverage>
 					</coverage>
-					<runtimeVersion>4.4.0-20230320</runtimeVersion>
+					<runtimeVersion>4.9.18</runtimeVersion>
 					<systemProperties>
 						<env>dev</env>
 					</systemProperties>
 					<argLines>
 						<argLine>-Denv=dev</argLine>
 						<argLine>-Dencrypt.key=secure12345</argLine>
-						<argLine>--add-opens=java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.io=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.lang.reflect=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.net=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.security=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.security.cert=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.text=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.util=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/java.util.concurrent=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/javax.crypto=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/sun.security.pkcs=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/sun.security.provider=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.base/sun.security.x509=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.desktop/java.awt.font=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.desktop/java.beans=ALL-UNNAMED</argLine>
-						<argLine>--add-opens=java.xml/com.sun.org.apache.xerces.internal.impl=ALL-UNNAMED</argLine>
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
 					</argLines>
 				</configuration>
 			</plugin>
@@ -87,6 +94,7 @@
 		<dependency>
 			<groupId>com.mulesoft.munit</groupId>
 			<artifactId>munit-runner</artifactId>
+            <version>3.6.3</version>
 			<classifier>mule-plugin</classifier>
 			<scope>test</scope>
 		</dependency>
@@ -99,16 +107,19 @@
 		<dependency>
 			<groupId>org.mule.connectors</groupId>
 			<artifactId>mule-http-connector</artifactId>
+            <version>1.11.3</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-apikit-module</artifactId>
+            <version>1.11.8</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
 			<groupId>com.mulesoft.modules</groupId>
 			<artifactId>mule-secure-configuration-property-module</artifactId>
+            <version>1.2.7</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
