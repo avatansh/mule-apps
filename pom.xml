@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
 		<artifactId>solutions-parent-pom</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 		<relativePath>../parent-pom/pom.xml</relativePath>
 	</parent>
 	<groupId>2e14f8c6-4d60-481b-bfb6-798695efc8f4</groupId>
